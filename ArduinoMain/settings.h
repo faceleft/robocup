@@ -1,6 +1,8 @@
 #ifndef settings_h
 #define settings_h
 
+#define PREF_STRING_BUFFER_LEN 20
+
 #define PREF_SERIAL_SPEED 115200
 #define PREF_SERIAL_TIMEOUT 50 //ms
 

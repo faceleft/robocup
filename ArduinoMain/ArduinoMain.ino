@@ -15,10 +15,10 @@
 void functionManager(String *message);
 
 void analyse(String text) {
-  String message[20];
+  String message[PREF_STRING_BUFFER_LEN];
   String Word;
   int len = text.length();
-  const char sep = '|';
+  const char sep = ' ';
   bool complited = false;
   text[len - 1] = sep;
   int counter = 0;
@@ -48,13 +48,17 @@ void analyse(String text) {
 }
 
 void functionManager(String *message) {
-  const char* command = message[0].c_str();
+  String& command = message[0];
   if (command == "heartbeat") {
     tft_print("heartbeat", 1, 220, 220, 255);
     Serial.println("heartbeat");
   } else if (command == "print") {
     tft_print("Jetson: ", 0, 255, 220, 255);
-    tft_print(message[1]);
+    for (int i = 1; i < PREF_STRING_BUFFER_LEN; i++) {
+      if (message[i] != "") tft_print(message[i]+" ", 0);
+    }
+    tft_print(String(""), 1);
+
   } else if (command == "motors") {
     motors.SetTarget((message[1]).toInt(), (message[2]).toInt());
   } else if (command == "mirror") {
@@ -75,12 +79,12 @@ void setup() {
   display.setFont(SmallFont);
   display.setColor(VGA_GREEN);
   pwm.begin();
-  
+
   pwm.setPWMFreq(60);
   tft_print("#Start!", 1, 220, 255, 220);
   //tft_print("#Serial: Speed=" + String(PREF_SERIAL_SPEED) + " Timeout=" + String(PREF_SERIAL_TIMEOUT), 1, 220, 255, 220);
-  pwm.setPWM(SERVO_BELT_ADDR, 0 ,SERVO_BELT_MEAN);
-  
+  pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
+
 }
 
 void loop() {
@@ -91,34 +95,34 @@ void loop() {
   }
   uint8_t a = buttons_click();
   if (a) {
-    sprintf(&s,"%d",a);
+    sprintf(&s, "%d", a);
     tft_print("Button " + s, 1, 220, 220, 255);
     Serial.println(s);
   }
-  if(a==1){
+  if (a == 1) {
     diodeColor(1024, 0, 0);
     servoF(-1.0, servo_neck);
     //mv::r_huk();
   }
-  if(a==2){
+  if (a == 2) {
     diodeColor(0, 1024, 0);
     servoF(0.0, servo_neck);
     //mv::l_huk();
   }
-  if(a==3){
+  if (a == 3) {
     diodeColor(0, 0, 1024);
     servoF(1.0, servo_neck);
     //mv::r_MAX();
   }
-  if(a==4){
+  if (a == 4) {
     diodeColor(1024, 1024, 1024);
     //mv::l_MAX();
   }
-  if(a==5){
+  if (a == 5) {
     diodeColor(0, 0, 0);
     //mv::tors();
   }
-  if(a==6){
+  if (a == 6) {
     diodeColor(1024, 0, 1024);
     //mv::mtrs();
   }
