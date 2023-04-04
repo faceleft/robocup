@@ -1,0 +1,57 @@
+#include "pins.h"
+#include "settings.h"
+#include "buttons.h"
+#include "voltage.h"
+void analyse(String text) {
+  String message[settings().msLen];
+  int msId = 0;
+  String Word;
+  int len = text.length();
+  text[len - 1] = ' ';
+  //*****************
+  for (int i = 0; i < len; i++) {
+    char sim = text[i];
+
+    if (sim == ' ') {
+      //Serial.println(Word);
+      message[msId] = Word;
+      msId++;
+      Word = "";
+    }
+    else {
+      Word += sim;
+    }
+
+  }
+  //****************
+  String command = message[0];
+  String args[settings().msLen - 1];
+  for (int i = 1; i < (settings().msLen); i++) {
+    args[i - 1] = message[i];
+  }
+  functionManager(command, args);
+
+}
+
+void functionManager(String command, String args[settings().msLen - 1]) {
+  byte curs = 0;
+  if(command == "heartbite"){
+    Serial.println("heartbite");
+  }
+}
+
+buttons b(pins().buttons, settings().buttons_num, settings().buttons_max_level);
+void setup() {
+  Serial.begin(settings().SerialSpeed);
+  Serial.setTimeout(settings().SerialTimeOut);
+  Serial.println(pins().motor_left_forward);
+  Serial.println(A0);
+  Serial.println(voltage(A1));
+}
+
+void loop() {
+//  if (Serial.available()) {
+//    analyse(Serial.readString());
+//  }
+  
+}
