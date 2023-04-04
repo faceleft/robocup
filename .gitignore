@@ -1,4 +1,6 @@
 **/logs
+**/build
 **/__pycache___
 **/__init__.py
+**/.vscode
 *.save

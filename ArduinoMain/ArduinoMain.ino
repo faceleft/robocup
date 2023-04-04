@@ -3,7 +3,6 @@
 #include "buttons.h"
 #include "tools.h"
 #include "motors.h"
-#include "list.h"
 #include "servo.h"
 #include "activ.h"
 #include "display.h"
@@ -13,17 +12,16 @@
 #include <Wire.h>
 
 
+void functionManager(String *message);
 
-
-void functionManager(const list<String>&);
 void analyse(String text) {
-
-  list<String> message;
+  String message[20];
   String Word;
   int len = text.length();
   const char sep = '|';
   bool complited = false;
   text[len - 1] = sep;
+  int counter = 0;
   //*****************
   for (int i = 0; i < len; i++) {
     char sim = text[i];
@@ -33,7 +31,8 @@ void analyse(String text) {
         complited = true;
         Word = "";
       } else {
-        message.append(Word);
+        message[counter] = Word;
+        counter++;
         Word = "";
       }
     } else {
@@ -46,19 +45,18 @@ void analyse(String text) {
   if (complited) {
     Serial.println("complited");
   }
-  message.clear();
 }
 
-void functionManager(list<String>& message) {
-  String command = message.at(0);
+void functionManager(String *message) {
+  const char* command = message[0].c_str();
   if (command == "heartbeat") {
     tft_print("heartbeat", 1, 220, 220, 255);
     Serial.println("heartbeat");
   } else if (command == "print") {
     tft_print("Jetson: ", 0, 255, 220, 255);
-    tft_print(message.at(1));
+    tft_print(message[1]);
   } else if (command == "motors") {
-    motors.SetTarget((message.at(1)).toInt(), (message.at(2)).toInt());
+    motors.SetTarget((message[1]).toInt(), (message[2]).toInt());
   } else if (command == "mirror") {
     mv::mirror();
   }
@@ -80,22 +78,21 @@ void setup() {
   
   pwm.setPWMFreq(60);
   tft_print("#Start!", 1, 220, 255, 220);
-  tft_print("#Serial: Speed=" + String(PREF_SERIAL_SPEED) + " Timeout=" + String(PREF_SERIAL_TIMEOUT), 1, 220, 255, 220);
+  //tft_print("#Serial: Speed=" + String(PREF_SERIAL_SPEED) + " Timeout=" + String(PREF_SERIAL_TIMEOUT), 1, 220, 255, 220);
   pwm.setPWM(SERVO_BELT_ADDR, 0 ,SERVO_BELT_MEAN);
   
 }
 
 void loop() {
-  static int j = SERVO_RH_MEAN;
-  static int k = SERVO_RV_MEAN;
   //print("test ");
+  char s;
   if (Serial.available()) {
     analyse(Serial.readString());
   }
   uint8_t a = buttons_click();
   if (a) {
-    String s = "Button " + String(a);
-    tft_print(s + " " + String(j), 1, 220, 220, 255);
+    sprintf(&s,"%d",a);
+    tft_print("Button " + s, 1, 220, 220, 255);
     Serial.println(s);
   }
   if(a==1){
