@@ -11,7 +11,7 @@ float voltage(uint8_t pin) {
   return ((float)analogRead(pin) * PREF_VREF) / 512;
 }
 
-void servoF(float angle, Servo s){
+void servoF(float angle, const Servo& s){
   angle = max(-1, min(1, angle));
   if(s.invert){
     angle = -angle;

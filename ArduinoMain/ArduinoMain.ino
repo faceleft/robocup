@@ -100,14 +100,17 @@ void loop() {
   }
   if(a==1){
     diodeColor(1024, 0, 0);
+    servoF(-1.0, servo_neck);
     //mv::r_huk();
   }
   if(a==2){
     diodeColor(0, 1024, 0);
+    servoF(0.0, servo_neck);
     //mv::l_huk();
   }
   if(a==3){
     diodeColor(0, 0, 1024);
+    servoF(1.0, servo_neck);
     //mv::r_MAX();
   }
   if(a==4){
