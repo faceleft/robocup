@@ -2,6 +2,7 @@
 #define activ_h
 #include "servo.h"
 #include "motors.h"
+#include "display.h"
 #define midle(a,b,c) min(max(b,a),c)
 namespace mv{
   void none(){

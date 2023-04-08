@@ -13,7 +13,7 @@ void error(int num){
     tft_print("ERROR: ", 0, 255, 0, 0);
     Serial.print("ERROR: ");
     
-    tft_print(num, 1, 255, 0, 0);
+    tft_print(String(num), 1, 255, 0, 0);
     Serial.println(num);    
     for(;;);
 }

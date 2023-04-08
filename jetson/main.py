@@ -1,6 +1,7 @@
+
 import sys  # импорт sys для добавления модулей в PATH (для импорта кастомных модулей)
 sys.path.append('/home/user/Desktop/project/modules/')
-
+#sys.path.append('Z:\\Users\\face-\\Desktop\\robocup\\modules\\')
 from pose_module import pose_module
 from my_serial import my_serial
 from Vector import Vector
