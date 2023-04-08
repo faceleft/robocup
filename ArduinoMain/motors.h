@@ -93,7 +93,7 @@ class Motors {
 
 };
 
-Motors motors(PIN_MOTOR_RIGHT_FORWARD,
+extern Motors motors(PIN_MOTOR_RIGHT_FORWARD,
               PIN_MOTOR_RIGHT_BACK,
               PIN_MOTOR_LEFT_FORWARD,
               PIN_MOTOR_LEFT_BACK,
