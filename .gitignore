@@ -1,7 +1,7 @@
-**/logs
-**/build
-**/__pycache___
+**/logs/
+**/build/
+**/__pycache__/
 **/__init__.py
-**/.vscode
-**/.idea
+**/.vscode/
+**/.idea/
 *.save

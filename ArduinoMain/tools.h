@@ -36,4 +36,14 @@ void diodeColor(int red, int green, int blue){
   pwm.setPWM(DIODE_BLUE_ADDR, 0, blue);
 }
 
+float computePID(float input, float setpoint, float kp, float ki, float kd, float dt, float minOut, float maxOut, int index) {
+  float err = setpoint - input;
+  static float integral[5]= {0,0,0,0,0};
+  static float prevErr[5]= {0,0,0,0,0};
+  integral[index] = constrain(integral[index] + (float)err * dt * ki, minOut, maxOut);
+  float D = (err - prevErr[index]) / dt;
+  prevErr[index] = err;
+  return constrain(err * kp + integral[index] + D * kd, minOut, maxOut);
+}
+
 #endif

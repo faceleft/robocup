@@ -84,6 +84,7 @@ void setup() {
   tft_print("#Start!", 1, 220, 255, 220);
   //tft_print("#Serial: Speed=" + String(PREF_SERIAL_SPEED) + " Timeout=" + String(PREF_SERIAL_TIMEOUT), 1, 220, 255, 220);
   pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
+  mv::none();
 
 }
 
@@ -101,29 +102,32 @@ void loop() {
   }
   if (a == 1) {
     diodeColor(1024, 0, 0);
-    servoF(-1.0, servo_neck);
+
     //mv::r_huk();
   }
   if (a == 2) {
     diodeColor(0, 1024, 0);
-    servoF(0.0, servo_neck);
+
     //mv::l_huk();
   }
   if (a == 3) {
     diodeColor(0, 0, 1024);
-    servoF(1.0, servo_neck);
+
     //mv::r_MAX();
   }
   if (a == 4) {
     diodeColor(1024, 1024, 1024);
-    //mv::l_MAX();
-  }
+
+  } 
   if (a == 5) {
     diodeColor(0, 0, 0);
+
     //mv::tors();
   }
   if (a == 6) {
     diodeColor(1024, 0, 1024);
+
     //mv::mtrs();
   }
+
 }

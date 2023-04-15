@@ -1,9 +1,8 @@
-
 import sys  # импорт sys для добавления модулей в PATH (для импорта кастомных модулей)
 sys.path.append('/home/user/Desktop/project/modules/')
 #sys.path.append('Z:\\Users\\face-\\Desktop\\robocup\\modules\\')
 from pose_module import pose_module
-from my_serial import my_serial
+from my_serial import my_serial1
 from Vector import Vector
 #import pygame
 import time
@@ -12,7 +11,7 @@ import math
 import numpy as np
 print("******************************")
 print("Библиотеки подключены")
-arduino = my_serial()
+arduino = my_serial1()
 print("Наличие Ардуино ", end='')
 arduino.connect('/dev/ttyUSB0')
 time.sleep(10)
