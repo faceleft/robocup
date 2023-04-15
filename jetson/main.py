@@ -89,8 +89,6 @@ def world_landmarks(marks, res):
         dots[c] = (centre - dot) * k
     return dots, visibility, k, centre[0]
 
-
-
 def view(wlms, vis):
     res = (800, 600, 1)
     blank = np.zeros(res, dtype='uint8')

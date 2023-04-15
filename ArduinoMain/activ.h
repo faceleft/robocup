@@ -159,6 +159,7 @@ void mirror() {
   static float neck_buff = 0;
   static float tors_buff = 0;
   static float motors_buff = 0;
+  unsigned long timer = millis();
   Serial.println("#start mirror");
   tft_print("#start mirror");
   /*
@@ -175,6 +176,44 @@ void mirror() {
   float step = 0.2;
   int speed = 100;
   while (1) {
+
+    uint8_t a = buttons_click();
+    if (a == 1) {
+      diodeColor(1024, 0, 0);
+      kp+=0.01;
+      //mv::r_huk();
+    }
+    if (a == 2) {
+      kp-=0.01;
+      diodeColor(0, 1024, 0);
+
+      //mv::l_huk();
+    }
+    if (a == 3) {
+      diodeColor(0, 0, 1024);
+      ki+=0.001;
+      //mv::r_MAX();
+    }
+    if (a == 4) {
+      ki-=0.001;
+      diodeColor(1024, 1024, 1024);
+
+    }
+    if (a == 5) {
+      diodeColor(0, 0, 0);
+      kd+=0.01;
+      //mv::tors();
+    }
+    if (a == 6) {
+      diodeColor(1024, 0, 1024);
+      kd-=0.01;
+      //mv::mtrs();
+    }
+    if (a) {
+      tft_print(String(kp)+" "+String(ki)+" "+String(kd), 1, 220, 220, 255);
+    }
+
+
     if (Serial.available() >= 5) {
       c = Serial.read();
       if (c == 0)break;
@@ -186,38 +225,34 @@ void mirror() {
 
         fdist = (float)dist / 125;
         //tft_print(String((int)dist));
-     /*
-        else {
-          if (dist > 100) motors.SetTarget(-100, -100);
-          else if (dist < 98) motors.SetTarget(100, 100);
-          else motors.SetTarget(0, 0);
-        }
-*/
+        /*
+           else {
+             if (dist > 100) motors.SetTarget(-100, -100);
+             else if (dist < 98) motors.SetTarget(100, 100);
+             else motors.SetTarget(0, 0);
+           }
+        */
         f = ((float)rotate / 125) * (-2) + 1;
 
-        float neck_x = computePID(-f, 0, 0.1, 0, 0, 1, -1, 1, 0);
-        neck_buff = constrain(neck_buff + neck_x, -1, 1);
-
-        float tors_x = computePID(-neck_buff, 0, 0.2, 0, 0, 1, -1, 1, 1);
-        tors_buff = tors_buff + tors_x;
-        if (tors_buff >= 1) {
-          //motors.SetTarget(-100, 100);
-          tors_buff = 1;
-        }
-        else if (tors_buff <= -1) {
-          //motors.SetTarget(100, -100);
-          tors_buff = -1;
-        }
-        else{
-          motors.SetTarget(0, -0);
-        }
         
-        //float motor_x = computePID(-tors_buff, 0, 10*kp, ki, kd, 1, -100, 100, 2);
-        //motors.IntWrite((int)motor_x, -(int)motor_x);
+        
+        float neck_x = computePID(-f, 0, kp, ki, kd, millis()-timer, -1, 1, 0);
+        //neck_buff = constrain(neck_buff + neck_x, -1, 1);
+        neck_buff = neck_x;
+        //tft_print(String(neck_x)+" "+String(neck_buff)+" "+String());
 
+        float tors_x = computePID(-neck_buff, 0, 0.2, 0, 0, millis()-timer, -1, 1, 1);
+        tors_buff = constrain(tors_buff + tors_x, -1, 1);
+
+        float motor_x = computePID(-tors_buff, 0, 100, 0, 0, millis()-timer, -255, 255, 2);
+        //motors.IntWrite(-(int)motor_x, (int)motor_x);
+
+        //float motor_x = computePID(-tors_buff, 0, 10*kp, ki, kd, 1, -100, 100, 2);
+        //
+        timer=millis();
         //rotate_buff += f*step;
         servoF(neck_buff, servo_neck);
-        servoF(tors_buff, servo_belt);
+        //servoF(tors_buff, servo_belt);
 
         servoF((float)r / 125, servo_rh);
         servoF((float)l / 125, servo_lh);
