@@ -85,6 +85,7 @@ void setup() {
   //tft_print("#Serial: Speed=" + String(PREF_SERIAL_SPEED) + " Timeout=" + String(PREF_SERIAL_TIMEOUT), 1, 220, 255, 220);
   pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
   mv::none();
+  mv::set_left();
 
 }
 
