@@ -15,6 +15,16 @@ extern uint8_t BigFont[];
 #else
 extern uint8_t SmallFont[];
 #endif
+void display_init(){
+  display.InitLCD();
+  display.clrScr();
+  #ifdef PREF_DISPLAY_BIG_FONT
+  display.setFont(BigFont);
+  #else
+  display.setFont(SmallFont);
+  #endif
+  display.setColor(VGA_GREEN);
+}
 
 void tft_print(String s = "", bool ln = 1, uint8_t r = 255, uint8_t g = 255, uint8_t b = 255) {
   static int n = 0;
@@ -27,7 +37,7 @@ void tft_print(String s = "", bool ln = 1, uint8_t r = 255, uint8_t g = 255, uin
         m = 0;
       }
       if (n >= PREF_DISPLAY_MAX_Y) {
-        display.clrScr();
+        //display.clrScr();
         n = 0;
       } 
       display.print(String(s[i]), m * PREF_DISPLAY_KX, n * PREF_DISPLAY_KY);

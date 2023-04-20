@@ -74,10 +74,7 @@ void setup() {
   Serial.begin(PREF_SERIAL_SPEED);
   Serial.setTimeout(PREF_SERIAL_TIMEOUT);
 
-  display.InitLCD();
-  display.clrScr();
-  display.setFont(SmallFont);
-  display.setColor(VGA_GREEN);
+  display_init();
   pwm.begin();
 
   pwm.setPWMFreq(60);
@@ -85,7 +82,7 @@ void setup() {
   //tft_print("#Serial: Speed=" + String(PREF_SERIAL_SPEED) + " Timeout=" + String(PREF_SERIAL_TIMEOUT), 1, 220, 255, 220);
   pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
   mv::none();
-  mv::set_left();
+  //mv::set_left();
 
 }
 
@@ -104,30 +101,30 @@ void loop() {
   if (a == 1) {
     diodeColor(1024, 0, 0);
 
-    //mv::r_huk();
+    mv::r_huk();
   }
   if (a == 2) {
     diodeColor(0, 1024, 0);
-
+    mv::l_huk();
     //mv::l_huk();
   }
   if (a == 3) {
     diodeColor(0, 0, 1024);
-
+    mv::r_aperkot();
     //mv::r_MAX();
   }
   if (a == 4) {
     diodeColor(1024, 1024, 1024);
-
+    mv::l_aperkot();
   } 
   if (a == 5) {
     diodeColor(0, 0, 0);
-
+    mv::r_MAX();
     //mv::tors();
   }
   if (a == 6) {
     diodeColor(1024, 0, 1024);
-
+    mv::l_MAX();
     //mv::mtrs();
   }
 

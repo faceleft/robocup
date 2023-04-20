@@ -19,59 +19,75 @@ void none() {
 }
 void r_huk() {
   servoF(-0.5, servo_belt);
+  servoF(0.5, servo_neck_like_belt);
+  
   servoF(0.85, servo_rh);
   servoF(-1, servo_rv);
 
   delay(200);
   servoF(0.75, servo_rv);
   servoF(1, servo_belt);
+  servoF(-1, servo_neck_like_belt);
   delay(400);
   servoF(0, servo_belt);
+  servoF(0, servo_neck_like_belt);
   servoF(0, servo_rh);
   servoF(0, servo_rv);
 }
 void l_huk() {
   servoF(0.5, servo_belt);
+  servoF(-0.5, servo_neck_like_belt);
   servoF(0.85, servo_lh);
   servoF(-1, servo_lv);
 
   delay(200);
   servoF(0.75, servo_lv);
   servoF(-1, servo_belt);
+  servoF(1, servo_neck_like_belt);
   delay(400);
   servoF(0, servo_belt);
+  servoF(0, servo_neck_like_belt);
   servoF(0, servo_lh);
   servoF(0, servo_lv);
 }
 void r_aperkot() {
   servoF(-1, servo_rv);
   servoF(-0.15, servo_belt);
+  servoF(0.15, servo_neck_like_belt);
   delay(100);
   servoF(1, servo_rv);
   servoF(0.6, servo_belt);
+  servoF(-0.6, servo_neck_like_belt);
   delay(400);
   servoF(0, servo_rv);
   servoF(0, servo_belt);
+  servoF(0, servo_neck_like_belt);
 }
 void l_aperkot() {
   servoF(-1, servo_lv);
   servoF(0.15, servo_belt);
+  servoF(-0.15, servo_neck_like_belt);
   delay(100);
   servoF(1, servo_lv);
   servoF(-0.6, servo_belt);
+  servoF(-0.6, servo_neck_like_belt);
   delay(400);
   servoF(0, servo_lv);
   servoF(0, servo_belt);
+  servoF(0, servo_neck_like_belt);
 }
 void meln() {
   servoF(1, servo_rh);
   servoF(1, servo_lh);
   delay(300);
   servoF(-1, servo_belt);
+  servoF(1, servo_neck_like_belt);
   delay(300);
   servoF(1, servo_belt);
+  servoF(-1, servo_neck_like_belt);
   delay(600);
   servoF(0, servo_belt);
+  servoF(0, servo_neck_like_belt);
   delay(300);
   servoF(0, servo_rh);
   servoF(0, servo_lh);
@@ -87,10 +103,12 @@ void r_MAX() {
   motors.IntWrite(-255, 255);
   servoF(1, servo_rv);
   servoF(1, servo_belt);
+  servoF(-1, servo_neck_like_belt);
   delay(400);
   motors.IntWrite(0, 0);
   delay(500);
   servoF(0, servo_belt);
+  servoF(0, servo_neck_like_belt);
   servoF(0, servo_rh);
   servoF(0, servo_rv);
   motors.IntWrite(64, -64);
@@ -108,10 +126,12 @@ void l_MAX() {
   motors.IntWrite(255, -255);
   servoF(1, servo_lv);
   servoF(-1, servo_belt);
+  servoF(1, servo_neck_like_belt);
   delay(400);
   motors.IntWrite(0, 0);
   delay(500);
   servoF(0, servo_belt);
+  servoF(0, servo_neck_like_belt);
   servoF(0, servo_lh);
   servoF(0, servo_lv);
   motors.IntWrite(-64, 64);
@@ -160,6 +180,19 @@ void set_left() {
   servoF(-1, servo_neck);
   servoF(-1, servo_belt);
 }
+void save_distance(int dist){
+   float f_dist = ((float)dist/125)*5;
+   if(f_dist>1.7){
+   motors.SetTarget(100,100); 
+   }
+   else if(f_dist<1.5){
+   motors.SetTarget(-100,-100); 
+   }
+   else{
+    motors.SetTarget(0,0); 
+   }
+   
+}
 void mirror() {
   static float kp = 0;
   static float ki = 1;
@@ -183,42 +216,16 @@ void mirror() {
   float rotate_buff = 0;
   float step = 0.2;
   int speed = 100;
+  float dist_mul = 1;
   while (1) {
 
     uint8_t a = buttons_click();
-    if (a == 1) {
-      diodeColor(1024, 0, 0);
-      kp += 0.01;
-      //mv::r_huk();
-    }
-    if (a == 2) {
-      kp -= 0.01;
-      diodeColor(0, 1024, 0);
-
-      //mv::l_huk();
-    }
-    if (a == 3) {
-      diodeColor(0, 0, 1024);
-      ki += 0.1;
-      //mv::r_MAX();
-    }
-    if (a == 4) {
-      ki -= 0.1;
-      diodeColor(1024, 1024, 1024);
-
-    }
-    if (a == 5) {
-      diodeColor(0, 0, 0);
-      kd += 0.01;
-      //mv::tors();
-    }
-    if (a == 6) {
-      diodeColor(1024, 0, 1024);
-      kd -= 0.01;
-      //mv::mtrs();
-    }
+    if (a == 1) dist_mul *= 2;
+    if (a == 2) dist_mul /= 2;
+    if (a == 3) dist_mul += 0.001;
+    if (a == 4) dist_mul -= 0.001;
     if (a) {
-      tft_print(String(kp) + " " + String(ki) + " " + String(kd), 1, 220, 220, 255);
+      tft_print(String(dist_mul), 1, 0, 255, 0);
     }
 
 
@@ -229,9 +236,10 @@ void mirror() {
         r = Serial.read() - 2;
         l = Serial.read() - 2;
         rotate = Serial.read() - 2;
-        dist = 125 - (Serial.read() - 2);
-
-        fdist = (float)dist / 125;
+        dist = (Serial.read() - 2);
+        save_distance(dist);
+        
+        tft_print(String(fdist)+"m");
 
         /*
            if {

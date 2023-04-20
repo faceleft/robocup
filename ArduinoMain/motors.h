@@ -45,10 +45,10 @@ class Motors {
     }
 
     void RawWrite(uint8_t rf, uint8_t rb, uint8_t lf, uint8_t lb) {
-      analogWrite(_pin_rf, rf);
-      analogWrite(_pin_rb, rb);
-      analogWrite(_pin_lf, lf);
-      analogWrite(_pin_lb, lb);
+      analogWrite(_pin_rf, min(255, rf));
+      analogWrite(_pin_rb, min(255, rb));
+      analogWrite(_pin_lf, min(255, lf));
+      analogWrite(_pin_lb, min(255, lb));
       this->r_state = (int)rf - (int)rb;
       this->l_state = (int)lf - (int)lb;
     }
