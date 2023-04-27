@@ -55,7 +55,7 @@ void functionManager(String *message) {
   } else if (command == "print") {
     tft_print("Jetson: ", 0, 255, 220, 255);
     for (int i = 1; i < PREF_STRING_BUFFER_LEN; i++) {
-      if (message[i] != "") tft_print(message[i]+" ", 0);
+      if (message[i] != "") tft_print(message[i] + " ", 0);
     }
     tft_print(String(""), 1);
 
@@ -87,11 +87,20 @@ void setup() {
 }
 
 void loop() {
-  //print("test ");
-  char s;
-  if (Serial.available()) {
-    analyse(Serial.readString());
+  if (mv::mirror_status.mirror_flag) {
+    mv::mirror();
+    if(mv::mirror_status.change_flag){
+      mv::rotate();
+      //mv::hands();
+      mv::mirror_status.change_flag = false;
+    }
   }
+  else {
+    if (Serial.available()) {
+      analyse(Serial.readString());
+    }
+  }
+  char s;
   uint8_t a = buttons_click();
   if (a) {
     sprintf(&s, "%d", a);
@@ -116,7 +125,7 @@ void loop() {
   if (a == 4) {
     diodeColor(1024, 1024, 1024);
     mv::l_aperkot();
-  } 
+  }
   if (a == 5) {
     diodeColor(0, 0, 0);
     mv::r_MAX();
