@@ -7,6 +7,7 @@
 #include "activ.h"
 #include "display.h"
 #include "error.h"
+#include "global_state.h"
 #include <SoftwareSerial.h>
 
 #include <Wire.h>
@@ -62,12 +63,18 @@ void functionManager(String *message) {
   } else if (command == "motors") {
     motors.SetTarget((message[1]).toInt(), (message[2]).toInt());
   } else if (command == "mirror") {
-    mv::mirror();
+    set_global_state(MIRROR);
+
   }
-  else {
-    tft_print("!unknown command: ", 0, 255, 0, 0);
-    tft_print(command, 1);
-  }
+} else if (command == "fight") {
+  set_global_state(FIGHT);
+  Serial.println("#start fight");
+  tft_print("#start fight");
+}
+else {
+  tft_print("!unknown command: ", 0, 255, 0, 0);
+  tft_print(command, 1);
+}
 }
 
 void setup() {
@@ -79,62 +86,68 @@ void setup() {
 
   pwm.setPWMFreq(60);
   tft_print("#Start!", 1, 220, 255, 220);
-  //tft_print("#Serial: Speed=" + String(PREF_SERIAL_SPEED) + " Timeout=" + String(PREF_SERIAL_TIMEOUT), 1, 220, 255, 220);
   pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
   mv::none();
-  //mv::set_left();
+  set_global_state(NONE);
 
 }
 
 void loop() {
-  if (mv::mirror_status.mirror_flag) {
-    mv::mirror();
-    if(mv::mirror_status.change_flag){
-      mv::rotate();
-      //mv::hands();
-      mv::mirror_status.change_flag = false;
-    }
+  switch (get_global_state()) {
+    case MIRROR: {
+        mv::mirror();
+        if (mv::mirror_status.change_flag) {
+          mv::mirror_rotate();
+          mv::mirror_hands();
+          mv::mirror_status.change_flag = false;
+        }
+        break;
+      }
+    case FIGHT: {
+        mv::fight();
+        if (mv::fight_status.change_flag) {
+          mv::fight_rotate();
+          mv::fight_hands();
+          mv::fight_status.change_flag = false;
+        }
+        break;
+      }
+    case NONE: {
+        if (Serial.available()) {
+          analyse(Serial.readString());
+        }
+        uint8_t a = buttons_click();
+        if (a) {
+          tft_print("Button " + String(a), 1, 220, 220, 255);
+        }
+        switch (a) {
+          case 0: break;
+          case 1: {
+              mv::r_huk();
+              break;
+            }
+          case 2: {
+              mv::l_huk();
+              break;
+            }
+          case 3: {
+              mv::r_aperkot();
+              break;
+            }
+          case 4: {
+              mv::l_aperkot();
+              break;
+            }
+          case 5: {
+              mv::r_MAX();
+              break;
+            }
+          case 6: {
+              mv::l_MAX();
+              break;
+            }
+        }
+        break;
+      }
   }
-  else {
-    if (Serial.available()) {
-      analyse(Serial.readString());
-    }
-  }
-  char s;
-  uint8_t a = buttons_click();
-  if (a) {
-    sprintf(&s, "%d", a);
-    tft_print("Button " + s, 1, 220, 220, 255);
-    Serial.println(s);
-  }
-  if (a == 1) {
-    diodeColor(1024, 0, 0);
-
-    mv::r_huk();
-  }
-  if (a == 2) {
-    diodeColor(0, 1024, 0);
-    mv::l_huk();
-    //mv::l_huk();
-  }
-  if (a == 3) {
-    diodeColor(0, 0, 1024);
-    mv::r_aperkot();
-    //mv::r_MAX();
-  }
-  if (a == 4) {
-    diodeColor(1024, 1024, 1024);
-    mv::l_aperkot();
-  }
-  if (a == 5) {
-    diodeColor(0, 0, 0);
-    mv::r_MAX();
-    //mv::tors();
-  }
-  if (a == 6) {
-    diodeColor(1024, 0, 1024);
-    mv::l_MAX();
-    //mv::mtrs();
-  }
-
 }

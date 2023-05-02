@@ -30,6 +30,10 @@ namespace func{
   float sine(float x){return 0.5*(sin((-PI)/2 + PI*x)+1);} 
 }
 
+float Byte2Val(byte val, float min_, float max_){
+  return (((float)(val-2))/253)*(max_-min_)+min_;
+}
+
 void diodeColor(int red, int green, int blue){
   pwm.setPWM(DIODE_RED_ADDR, 0, red);
   pwm.setPWM(DIODE_GREEN_ADDR, 0, green);

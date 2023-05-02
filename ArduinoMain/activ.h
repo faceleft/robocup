@@ -4,7 +4,8 @@
 #include "motors.h"
 #include "display.h"
 #include "tools.h"
-#define midle(a,b,c) min(max(b,a),c)
+#include "global_state.h"
+
 namespace mv {
 struct {
   float r_hand;
@@ -12,8 +13,13 @@ struct {
   float angle;
   float dist;
   bool change_flag = false;
-  bool mirror_flag = false;
 } mirror_status;
+
+struct {
+  float angle;
+  float dist;
+  bool change_flag = false;
+} fight_status;
 
 void none() {
   motors.IntWrite(0, 0);
@@ -100,7 +106,6 @@ void meln() {
   servoF(0, servo_rh);
   servoF(0, servo_lh);
 }
-
 void r_MAX() {
   motors.IntWrite(64, -64);
   for (float i = 0; i < 200; i++) {
@@ -147,7 +152,6 @@ void l_MAX() {
   delay(1100);
   motors.IntWrite(0, 0);
 }
-
 void tors() {
   motors.IntWrite(128, -128);
   for (float i = 0; i < 50; i++) {
@@ -173,7 +177,6 @@ void tors() {
   }
   motors.IntWrite(0, 0);
 }
-
 void mtrs() {
   motors.SoftWrite(128, 128);
   delay(500);
@@ -183,17 +186,14 @@ void mtrs() {
   delay(500);
   motors.SoftWrite(0, 0);
 }
-
 void set_right() {
   servoF(1, servo_neck);
   servoF(1, servo_belt);
 }
-
 void set_left() {
   servoF(-1, servo_neck);
   servoF(-1, servo_belt);
 }
-
 void save_distance(int dist) {
   float f_dist = ((float)dist / 125) * 5;
   if (f_dist > 1.7) {
@@ -206,7 +206,7 @@ void save_distance(int dist) {
     motors.SetTarget(0, 0);
   }
 }
-void rotate() {
+void mirror_rotate() {
   float motors_buff, neck_buff, tors_buff;
   float neck_x = computePID(mirror_status.angle, 0, 0, 1, 0.01, 0.1, -1.1, 1.1, 0);
   neck_buff = constrain(neck_x, -1, 1);
@@ -224,45 +224,63 @@ void rotate() {
   motors.IntWrite(-100 * motors_buff, 100 * motors_buff);
 
 }
-void hands() {
-  servoF(mirror_status.r_hand, servo_rh);
-  servoF(mirror_status.l_hand, servo_lh);
+void mirror_hands() {
+  servoF(mirror_status.r_hand * 2, servo_rh);
+  servoF(mirror_status.l_hand * 2, servo_lh);
 }
-
-void mirror() {
-  if (!mirror_status.mirror_flag) {
-    Serial.println("#start mirror");
-    tft_print("#start mirror");
-    mirror_status.mirror_flag = true;
+void fight_rotate() {
+  float motors_buff, neck_buff, tors_buff;
+  float neck_x = computePID(fight_status.angle, 0, 0, 1, 0.01, 0.1, -1.1, 1.1, 0);
+  neck_buff = constrain(neck_x, -1, 1);
+  if (neck_x > 1) {
+    motors_buff = 1;
   }
-  char c, r, l, rotate, dist;
-  float f, fdist;
-  float rotate_buff = 0;
+  else if (neck_x < -1) {
+    motors_buff = -1;
+  }
+  else {
+    motors_buff = 0;
+  }
+  servoF(neck_buff, servo_neck);
+  servoF(neck_buff, servo_belt);
+  motors.IntWrite(-100 * motors_buff, 100 * motors_buff);
 
+}
+void fight_hands() {
+  servoF(fight_status.r_hand * 2, servo_rh);
+  servoF(fight_status.l_hand * 2, servo_lh);
+}
+void mirror() {
+  char c;
   if (Serial.available() >= 5) {
     c = Serial.read();
     if (c == 0) {
-      mirror_status.mirror_flag = false;
-      motors.SetTarget(0, 0);
-      motors.IntWrite(0, 0);
-      tft_print("#end mirror");
-      Serial.println("#end mirror");
+      set_global_state(NONE);
       return;
     }
     else if (c == 1) {
-      r = Serial.read() - 2;
-      l = Serial.read() - 2;
-      rotate = Serial.read() - 2;
-      dist = (Serial.read() - 2);
-      mirror_status.r_hand = (float)r / 125;
-      mirror_status.l_hand = (float)l / 125;
-      mirror_status.angle = ((float)rotate / 125) * 2 - 1;
-      mirror_status.dist = ((float)dist / 125) * 5;
+      mirror_status.r_hand = Byte2Val(Serial.read(), 0, 1);
+      mirror_status.l_hand = Byte2Val(Serial.read(), 0, 1);
+      mirror_status.angle = Byte2Val(Serial.read(), -1, 1);
+      mirror_status.dist = Byte2Val(Serial.read(), 0, 1);
       mirror_status.change_flag = true;
     }
   }
 }
-
-
+void fight() {
+  char c;
+  if (Serial.available() >= 3) {
+    c = Serial.read();
+    if (c == 0) {
+      set_global_state(NONE);
+      return;
+    }
+    else if (c == 1) {
+      fight_status.angle = Byte2Val(Serial.read(), -1, 1);
+      fight_status.dist = Byte2Val(Serial.read(), 0, 1);
+      fight_status.change_flag = true;
+    }
+  }
+}
 }
 #endif
