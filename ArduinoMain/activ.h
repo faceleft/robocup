@@ -8,8 +8,10 @@
 
 namespace mv {
 struct {
-  float r_hand;
-  float l_hand;
+  float rv_hand;
+  float lv_hand; 
+  float rh_hand;
+  float lh_hand;
   float angle;
   float dist;
   bool change_flag = false;
@@ -194,7 +196,7 @@ void set_left() {
   servoF(-1, servo_neck);
   servoF(-1, servo_belt);
 }
-void save_distance(int dist) {
+void mirrot_save_distance(int dist) {
   float f_dist = ((float)dist / 125) * 5;
   if (f_dist > 1.7) {
     motors.SetTarget(100, 100);
@@ -208,25 +210,24 @@ void save_distance(int dist) {
 }
 void mirror_rotate() {
   float motors_buff, neck_buff, tors_buff;
-  float neck_x = computePID(mirror_status.angle, 0, 0, 1, 0.01, 0.1, -1.1, 1.1, 0);
+  float neck_x = computePID(mirror_status.angle, 0, 0, 1, 0.01, 0.1, -1.01, 1.01, 0);
   neck_buff = constrain(neck_x, -1, 1);
   if (neck_x > 1) {
-    motors_buff = 1;
+    //motors.byTime(-100, 100, 2000);
   }
   else if (neck_x < -1) {
-    motors_buff = -1;
+    motors.byTime(100, -100, 2000);
   }
-  else {
-    motors_buff = 0;
-  }
+  tft_print(String(neck_x));
   servoF(neck_buff, servo_neck);
   servoF(neck_buff, servo_belt);
-  motors.IntWrite(-100 * motors_buff, 100 * motors_buff);
-
 }
 void mirror_hands() {
-  servoF(mirror_status.r_hand * 2, servo_rh);
-  servoF(mirror_status.l_hand * 2, servo_lh);
+  servoF(mirror_status.rh_hand * 2, servo_rh);
+  servoF(mirror_status.lh_hand * 2, servo_lh);
+  
+  servoF(mirror_status.rv_hand, servo_rv);
+  servoF(mirror_status.lv_hand, servo_lv);
 }
 void fight_rotate() {
   float motors_buff, neck_buff, tors_buff;
@@ -247,8 +248,6 @@ void fight_rotate() {
 
 }
 void fight_hands() {
-  servoF(fight_status.r_hand * 2, servo_rh);
-  servoF(fight_status.l_hand * 2, servo_lh);
 }
 void mirror() {
   char c;
@@ -259,8 +258,10 @@ void mirror() {
       return;
     }
     else if (c == 1) {
-      mirror_status.r_hand = Byte2Val(Serial.read(), 0, 1);
-      mirror_status.l_hand = Byte2Val(Serial.read(), 0, 1);
+      mirror_status.rv_hand = Byte2Val(Serial.read(), 0, 1);
+      mirror_status.lv_hand = Byte2Val(Serial.read(), 0, 1);
+      mirror_status.rh_hand = Byte2Val(Serial.read(), 0, 1);
+      mirror_status.lh_hand = Byte2Val(Serial.read(), 0, 1);
       mirror_status.angle = Byte2Val(Serial.read(), -1, 1);
       mirror_status.dist = Byte2Val(Serial.read(), 0, 1);
       mirror_status.change_flag = true;

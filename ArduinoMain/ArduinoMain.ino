@@ -64,17 +64,13 @@ void functionManager(String *message) {
     motors.SetTarget((message[1]).toInt(), (message[2]).toInt());
   } else if (command == "mirror") {
     set_global_state(MIRROR);
-
+  } else if (command == "fight") {
+    set_global_state(FIGHT);
   }
-} else if (command == "fight") {
-  set_global_state(FIGHT);
-  Serial.println("#start fight");
-  tft_print("#start fight");
-}
-else {
-  tft_print("!unknown command: ", 0, 255, 0, 0);
-  tft_print(command, 1);
-}
+  else {
+    tft_print("!unknown command: ", 0, 255, 0, 0);
+    tft_print(command, 1);
+  }
 }
 
 void setup() {
@@ -89,10 +85,10 @@ void setup() {
   pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
   mv::none();
   set_global_state(NONE);
-
 }
 
 void loop() {
+  motors.Work();
   switch (get_global_state()) {
     case MIRROR: {
         mv::mirror();
@@ -102,7 +98,7 @@ void loop() {
           mv::mirror_status.change_flag = false;
         }
         break;
-      }
+    }
     case FIGHT: {
         mv::fight();
         if (mv::fight_status.change_flag) {
@@ -111,7 +107,7 @@ void loop() {
           mv::fight_status.change_flag = false;
         }
         break;
-      }
+    }
     case NONE: {
         if (Serial.available()) {
           analyse(Serial.readString());
@@ -122,32 +118,32 @@ void loop() {
         }
         switch (a) {
           case 0: break;
+          
           case 1: {
               mv::r_huk();
-              break;
-            }
+            } break;
+            
           case 2: {
               mv::l_huk();
-              break;
-            }
+            } break;
+            
           case 3: {
               mv::r_aperkot();
-              break;
-            }
+            } break;
+            
           case 4: {
               mv::l_aperkot();
-              break;
-            }
+            } break;
+            
           case 5: {
               mv::r_MAX();
-              break;
-            }
+            } break;
+            
           case 6: {
               mv::l_MAX();
-              break;
-            }
-        }
-        break;
+            } break;
+        } break;
+        
       }
   }
 }

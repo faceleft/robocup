@@ -15,14 +15,6 @@ void set_global_state(t_state state) {
         diodeColor(0, 0, 512);
         //Serial.println("#wait");
         tft_print("#start wait");
-        motors.IntWrite(0, 0);
-        motors.SetTarget(0, 0);
-        servoF(0, servo_belt);
-        servoF(0, servo_rh);
-        servoF(0, servo_rv);
-        servoF(0, servo_lh);
-        servoF(0, servo_lv);
-        servoF(0, servo_neck);
         break;
       }
     case MIRROR: {
@@ -40,6 +32,6 @@ void set_global_state(t_state state) {
   }
 }
 
-#define get_global_state() __global_state
+#define get_global_state() (__global_state)
 
 #endif
