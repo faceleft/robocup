@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #ifndef activ_h
 #define activ_h
 #include "servo.h"
@@ -5,6 +6,7 @@
 #include "display.h"
 #include "tools.h"
 #include "global_state.h"
+
 
 namespace mv {
 struct {
@@ -250,37 +252,43 @@ void fight_rotate() {
 void fight_hands() {
 }
 void mirror() {
-  char c;
-  if (Serial.available() >= 5) {
-    c = Serial.read();
-    if (c == 0) {
-      set_global_state(NONE);
+  if(Serial.available()){
+    char b = Serial.read();
+    if(b==0){
+      set_global_state(FIGHT);
       return;
     }
-    else if (c == 1) {
-      mirror_status.rv_hand = Byte2Val(Serial.read(), 0, 1);
-      mirror_status.lv_hand = Byte2Val(Serial.read(), 0, 1);
-      mirror_status.rh_hand = Byte2Val(Serial.read(), 0, 1);
-      mirror_status.lh_hand = Byte2Val(Serial.read(), 0, 1);
-      mirror_status.angle = Byte2Val(Serial.read(), -1, 1);
-      mirror_status.dist = Byte2Val(Serial.read(), 0, 1);
+    global_serial_buffer.add(B);
+  }
+  while(global_serial_buffer.check_top()!=1) global_serial_buffer.get();
+
+  if (global_serial_buffer.len()>=7) {
+      global_serial_buffer.get();
+      mirror_status.rv_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+      mirror_status.lv_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+      mirror_status.rh_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+      mirror_status.lh_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+      mirror_status.angle = Byte2Val(global_serial_buffer.get(), -1, 1);
+      mirror_status.dist = Byte2Val(global_serial_buffer.get(), 0, 1);
       mirror_status.change_flag = true;
-    }
   }
 }
 void fight() {
-  char c;
-  if (Serial.available() >= 3) {
-    c = Serial.read();
-    if (c == 0) {
-      set_global_state(NONE);
+  if(Serial.available()){
+    char b = Serial.read();
+    if(b==0){
+      set_global_state(FIGHT);
       return;
     }
-    else if (c == 1) {
-      fight_status.angle = Byte2Val(Serial.read(), -1, 1);
-      fight_status.dist = Byte2Val(Serial.read(), 0, 1);
+    global_serial_buffer.add(B);
+  }
+  while(global_serial_buffer.check_top()!=1) global_serial_buffer.get();
+
+  if (global_serial_buffer.len()>=3) {
+      global_serial_buffer.get();
+      fight_status.angle = Byte2Val(global_serial_buffer.get(), -1, 1);
+      fight_status.dist = Byte2Val(global_serial_buffer.get(), 0, 1);
       fight_status.change_flag = true;
-    }
   }
 }
 }
