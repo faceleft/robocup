@@ -84,7 +84,8 @@ def world_landmarks(marks, res):
     dots = [Vector([i.x, i.y * (res[1] / res[0]), i.z / 2]) for i in marks]
     visibility = [i.visibility for i in marks]
     centre = (dots[11] + dots[12] + dots[23] + dots[24]) / 4
-    k = 0.5 / (dots[11] - dots[12]).length()
+    k = (dots[11] - dots[12]).length()
+    k = 0.26/(k-0.04)
     for c, dot in enumerate(dots):
         dots[c] = (centre - dot) * k
     return dots, visibility, k, centre[0]
@@ -152,7 +153,8 @@ def serial_monitor():
         return arduino.read()
     else: 
         return None
-
+def toByte(val, min_, max_):
+    return (round(min(max(val-min_, 0), max_-min_)*(253.0/(max_-min_)))+2).to_bytes(1, "big")
 
 
 def main():
@@ -161,46 +163,45 @@ def main():
     global other_ready
     global final_sign
     prev_time = time.time()
-    prev_signs = (('', 0), ('', 0))
-    flag = 0
-    flag_time = time.time()
-    motorflag = 0  
-    arduino.write("mirror\n")
     while True:
         cur_time = time.time()
         
         inp = serial_monitor()
         if inp == "#complited":
             flag = 0
+        if inp == "start":
+            switch=1
+            arduino.write("mirror\n")
         #print(inp, flag)
         success, img = cap.read()
         if not success:
             continue
-
-        if switch:
-            img = detector.process(img)
-            lms = detector.get_landmarks()
-            if lms:
-                wlms, visible, k, centre = world_landmarks(lms, (int(cap.get(3)), int(cap.get(4))))
-                #print(wlms[16], k, centre, motorflag, "m"+chr(105)+chr(5)+chr(105)+chr(5))
+        
+        img = detector.process(img)
+        lms = detector.get_landmarks()
+        if lms:
+            wlms, visible, k, centre = world_landmarks(lms, (int(cap.get(3)), int(cap.get(4))))
+            if switch == 1:
                 angle_r = detect_angle([wlms[13],wlms[11],wlms[23]])
                 angle_l = detect_angle([wlms[14],wlms[12],wlms[24]])
-                
-                angle_r = round(min(max(angle_r-20, 0), 70)*(125.0/70.0))+2
-                angle_l = round(min(max(angle_l-20, 0), 70)*(125.0/70.0))+2
-                rotate = round(min(max(centre, 0), 1)*125)+2
-                distance = round(min(max(0.5/k, 0), 1)*125)+2
-
-                print(0.5/k, angle_r, angle_l,rotate)
-                arduino.bytewrite(chr(1).encode())
-                arduino.bytewrite(chr(angle_r).encode())
-                arduino.bytewrite(chr(angle_l).encode())
-                arduino.bytewrite(chr(rotate).encode())
-                arduino.bytewrite(chr(distance).encode())
-                view(wlms, visible)
+                min_=20
+                max_=180
+                #print((round(min(max(angle_r-min_, 0), max_-min_)*(253.0/(max_-min_)))+2))
+                print(wlms[16][2]-wlms[12][2], wlms[15][2]-wlms[11][2])
+                arduino.bytewrite((1).to_bytes(1, "big"))
+                arduino.bytewrite(toByte(wlms[15][2]-wlms[11][2], 0, 1))
+                arduino.bytewrite(toByte(wlms[16][2]-wlms[12][2], 0, 1))
+                arduino.bytewrite(toByte(angle_r, 20, 180))
+                arduino.bytewrite(toByte(angle_l, 20, 180))
+                arduino.bytewrite(toByte(centre, 0, 1))
+                arduino.bytewrite(toByte(k/5, 0, 1))
+                if angle_r>160 and angle_l>160:
+                    arduino.bytewrite((0).to_bytes(1, "big"))
+                    arduino.write("fight\n")
+                    switch=2
                 #detect(wlms)
 
-
+            view(wlms, visible)
         frame_time = round(1/(cur_time - prev_time), 1)
         cv2.putText(img, str(frame_time) + "fps", (40, 50),
                     cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 0, 255), 2)
@@ -211,23 +212,7 @@ def main():
 dispW = 400
 dispH = 240
 i = 0
-#gamepad = Controller(0)
-#while True:
-#    #3-y
-#    #2-x
-#    #1-b
-#    #0-a
-#    a = gamepad.listen(1)
-#    m0 = chr(int(a[0]) * 125)
-#    m1 = chr(int(a[1])* 126)
-#    m2 = chr(int(a[2]) * 118)
-#    m3 = chr(int(a[3]) * 129)
-#    ms = "m"+m0+m1+m2+m3
-#    arduino.write(ms)
-#    print(ms,chr(100),int(a[0]), m0, a[0])
-#
-#    print(a)
-i = 0
+
 while True: 
     cap = cv2.VideoCapture(i)
     font=cv2.FONT_HERSHEY_SIMPLEX
@@ -239,13 +224,11 @@ while True:
     fps = int(cap.get(5))
 
     if width == 0 or height == 0 or fps == 0:
-        
         print("Попытка подключиться к камере ", i)
         i=i+1
         if i>10:
             print("Камера не найдена")
             exit()
-
     else:
         print(f'Camera resolution: {width}x{height}, FPS: {fps}')
         break
@@ -253,7 +236,7 @@ while True:
 time.sleep(1)
 detector = pose_module()
 #gamepad = Controller(0)
-switch = True
+switch = 0
 other_ready = False
 final_sign = ''
 
