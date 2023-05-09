@@ -21,6 +21,10 @@ void set_global_state(t_state state) {
         diodeColor(0, 0, 512);
         //Serial.println("#wait");
         tft_print("#start wait");
+        servoF(0, servo_rh);
+        servoF(0, servo_rv);
+        servoF(0, servo_lh);
+        servoF(0, servo_lv);
         break;
       }
     case MIRROR: {
@@ -28,6 +32,10 @@ void set_global_state(t_state state) {
         diodeColor(0, 512, 0);
         //Serial.println("#start mirror");
         tft_print("#start mirror");
+        servoF(0, servo_rh);
+        servoF(0, servo_rv);
+        servoF(0, servo_lh);
+        servoF(0, servo_lv);
         break;
       }
     case FIGHT: {
@@ -35,6 +43,10 @@ void set_global_state(t_state state) {
         diodeColor(512, 0, 0);
         //Serial.println("#start fight");
         tft_print("#start fight");
+        servoF(0, servo_rh);
+        servoF(0, servo_rv);
+        servoF(0, servo_lh);
+        servoF(0, servo_lv);
         break;
       }
   }

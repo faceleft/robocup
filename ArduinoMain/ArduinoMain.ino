@@ -93,6 +93,7 @@ void loop() {
     case MIRROR: {
         mv::mirror();
         if (mv::mirror_status.change_flag) {
+          mv::mirror_save_distance();
           mv::mirror_rotate();
           mv::mirror_hands();
           mv::mirror_status.change_flag = false;
@@ -102,7 +103,6 @@ void loop() {
     case FIGHT: {
         mv::fight();
         if (mv::fight_status.change_flag) {
-          mv::fight_rotate();
           mv::fight_hands();
           mv::fight_status.change_flag = false;
         }
@@ -120,7 +120,8 @@ void loop() {
           case 0: break;
           
           case 1: {
-              mv::r_huk();
+              Serial.println("start");
+              //mv::r_huk();
             } break;
             
           case 2: {

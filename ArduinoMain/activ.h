@@ -17,6 +17,7 @@ struct {
   float angle;
   float dist;
   bool change_flag = false;
+  bool rotate_flag = false;
 } mirror_status;
 
 struct {
@@ -198,58 +199,73 @@ void set_left() {
   servoF(-1, servo_neck);
   servoF(-1, servo_belt);
 }
-void mirrot_save_distance(int dist) {
-  float f_dist = ((float)dist / 125) * 5;
-  if (f_dist > 1.7) {
-    motors.SetTarget(100, 100);
+void mirror_save_distance() {
+  tft_print(String(mirror_status.dist));
+  if (mirror_status.dist > 0.6) {
+    motors.IntWrite(-100, -100);
   }
-  else if (f_dist < 1.5) {
-    motors.SetTarget(-100, -100);
+  else if (mirror_status.dist < 0.4) {
+    motors.IntWrite(100, 100);
   }
   else {
-    motors.SetTarget(0, 0);
+    motors.IntWrite(0, 0);
   }
 }
 void mirror_rotate() {
-  float motors_buff, neck_buff, tors_buff;
-  float neck_x = computePID(mirror_status.angle, 0, 0, 1, 0.01, 0.1, -1.01, 1.01, 0);
-  neck_buff = constrain(neck_x, -1, 1);
-  if (neck_x > 1) {
-    //motors.byTime(-100, 100, 2000);
+  float neck_x = computePID(mirror_status.angle, 0, 0, 0.8, 0.01, 0.1, -1, 1, 0);
+  float neck_buff = constrain(neck_x, -1, 1);
+  if (neck_x > 0.7) {
+    //motors.IntWrite(-100, 100);
   }
-  else if (neck_x < -1) {
-    motors.byTime(100, -100, 2000);
+  else if (neck_x < -0.7) {
+    //motors.IntWrite(100, -100);
   }
-  tft_print(String(neck_x));
+  else {
+    //motors.IntWrite(0, 0);
+   }
+  //tft_print(String(neck_x));
   servoF(neck_buff, servo_neck);
   servoF(neck_buff, servo_belt);
+  
+  if(mirror_status.rotate_flag) {
+    float motors_x = computePID(neck_buff, 0, 200, 1, 0, 0.1, -100, 100, 1);
+    motors.IntWrite(motors_x, -motors_x);
+  }
 }
+
 void mirror_hands() {
   servoF(mirror_status.rh_hand * 2, servo_rh);
   servoF(mirror_status.lh_hand * 2, servo_lh);
   
   servoF(mirror_status.rv_hand, servo_rv);
   servoF(mirror_status.lv_hand, servo_lv);
-}
-void fight_rotate() {
-  float motors_buff, neck_buff, tors_buff;
-  float neck_x = computePID(fight_status.angle, 0, 0, 1, 0.01, 0.1, -1.1, 1.1, 0);
-  neck_buff = constrain(neck_x, -1, 1);
-  if (neck_x > 1) {
-    motors_buff = 1;
-  }
-  else if (neck_x < -1) {
-    motors_buff = -1;
+  
+  if (mirror_status.lh_hand*160+20 >= 130) {
+    //mirror_status.rotate_flag = 1;
   }
   else {
-    motors_buff = 0;
+    mirror_status.rotate_flag = 0;
   }
-  servoF(neck_buff, servo_neck);
-  servoF(neck_buff, servo_belt);
-  motors.IntWrite(-100 * motors_buff, 100 * motors_buff);
-
 }
-void fight_hands() {
+
+void fight_rotate() {
+  float motors_buff, neck_buff, tors_buff;
+  float neck_x = computePID(fight_status.angle, 0, 1, 0, 0, 0.1, -1.1, 1.1, 0);
+  motors.IntWrite(-100 * neck_x, 100 * neck_x);
+}
+void fight_hands(){}
+void punch() {
+  static int i = 0;
+  void (*mvs[])(void) = {
+    r_huk,
+    l_aperkot,
+    l_MAX,
+    l_huk,
+    r_MAX,
+    r_aperkot,
+  };
+  mvs[i]();
+  i = (i+1)%5;
 }
 void mirror() {
   if(Serial.available()){
@@ -258,9 +274,15 @@ void mirror() {
       set_global_state(FIGHT);
       return;
     }
-    global_serial_buffer.add(B);
+    global_serial_buffer.add(b);
   }
-  while(global_serial_buffer.check_top()!=1) global_serial_buffer.get();
+
+
+  if(global_serial_buffer.len()) {
+    if(global_serial_buffer.check_top()!=1) {
+      global_serial_buffer.get();
+    }
+  }
 
   if (global_serial_buffer.len()>=7) {
       global_serial_buffer.get();
@@ -277,13 +299,18 @@ void fight() {
   if(Serial.available()){
     char b = Serial.read();
     if(b==0){
-      set_global_state(FIGHT);
       return;
     }
-    global_serial_buffer.add(B);
+    global_serial_buffer.add(b);
   }
-  while(global_serial_buffer.check_top()!=1) global_serial_buffer.get();
+  
 
+  if(global_serial_buffer.len()) {
+    if(global_serial_buffer.check_top()!=1) {
+      global_serial_buffer.get();
+    }
+  }
+    
   if (global_serial_buffer.len()>=3) {
       global_serial_buffer.get();
       fight_status.angle = Byte2Val(global_serial_buffer.get(), -1, 1);
