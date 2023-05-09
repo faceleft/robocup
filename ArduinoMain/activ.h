@@ -11,7 +11,7 @@
 namespace mv {
 struct {
   float rv_hand;
-  float lv_hand; 
+  float lv_hand;
   float rh_hand;
   float lh_hand;
   float angle;
@@ -24,6 +24,7 @@ struct {
   float angle;
   float dist;
   bool change_flag = false;
+  bool save_distance_flag = false;
 } fight_status;
 
 void none() {
@@ -200,12 +201,11 @@ void set_left() {
   servoF(-1, servo_belt);
 }
 void mirror_save_distance() {
-  tft_print(String(mirror_status.dist));
-  if (mirror_status.dist > 0.6) {
-    motors.IntWrite(-100, -100);
+  if (mirror_status.dist > 0.5) {
+    motors.IntWrite(-160, -160);
   }
-  else if (mirror_status.dist < 0.4) {
-    motors.IntWrite(100, 100);
+  else if (mirror_status.dist < 0.3) {
+    motors.IntWrite(160, 160);
   }
   else {
     motors.IntWrite(0, 0);
@@ -222,12 +222,12 @@ void mirror_rotate() {
   }
   else {
     //motors.IntWrite(0, 0);
-   }
+  }
   //tft_print(String(neck_x));
   servoF(neck_buff, servo_neck);
   servoF(neck_buff, servo_belt);
-  
-  if(mirror_status.rotate_flag) {
+
+  if (mirror_status.rotate_flag) {
     float motors_x = computePID(neck_buff, 0, 200, 1, 0, 0.1, -100, 100, 1);
     motors.IntWrite(motors_x, -motors_x);
   }
@@ -236,11 +236,11 @@ void mirror_rotate() {
 void mirror_hands() {
   servoF(mirror_status.rh_hand * 2, servo_rh);
   servoF(mirror_status.lh_hand * 2, servo_lh);
-  
+
   servoF(mirror_status.rv_hand, servo_rv);
   servoF(mirror_status.lv_hand, servo_lv);
-  
-  if (mirror_status.lh_hand*160+20 >= 130) {
+
+  if (mirror_status.lh_hand * 160 + 20 >= 130) {
     //mirror_status.rotate_flag = 1;
   }
   else {
@@ -249,28 +249,54 @@ void mirror_hands() {
 }
 
 void fight_rotate() {
-  float motors_buff, neck_buff, tors_buff;
-  float neck_x = computePID(fight_status.angle, 0, 1, 0, 0, 0.1, -1.1, 1.1, 0);
-  motors.IntWrite(-100 * neck_x, 100 * neck_x);
+  if (fight_status.save_distance_flag == false) {
+    float neck_x = computePID(fight_status.angle, 0, 3, 0, 0, 0.1, -1, 1, 2);
+    motors.IntWrite(-100 * neck_x, 100 * neck_x);
+  }
 }
-void fight_hands(){}
+
 void punch() {
   static int i = 0;
   void (*mvs[])(void) = {
     r_huk,
     l_aperkot,
-    l_MAX,
     l_huk,
-    r_MAX,
     r_aperkot,
+    r_MAX,
+    l_aperkot,
+    l_huk,
   };
   mvs[i]();
-  i = (i+1)%5;
+  i = (i + 1) % (sizeof(mvs) / sizeof(mvs[0]));
 }
+
+void fight_delay(uint32_t ms);
+void fight_save_distance() {
+  if (fight_status.dist > 0.5) {
+    motors.IntWrite(-160, -160);
+    fight_status.save_distance_flag = true;
+  }
+  else if (fight_status.dist < 0.3) {
+    motors.IntWrite(160, 160);
+    fight_status.save_distance_flag = true;
+  }
+  else {
+
+    if (fight_status.save_distance_flag) {
+      motors.IntWrite(0, 0);
+      punch();
+      fight_delay(1000);
+      fight_status.save_distance_flag = false;
+    }
+  }
+}
+
+
+
 void mirror() {
-  if(Serial.available()){
+  if (Serial.available()) {
     char b = Serial.read();
-    if(b==0){
+    if (b == 0) {
       set_global_state(FIGHT);
       return;
     }
@@ -278,45 +304,52 @@ void mirror() {
   }
 
 
-  if(global_serial_buffer.len()) {
-    if(global_serial_buffer.check_top()!=1) {
+  if (global_serial_buffer.len()) {
+    if (global_serial_buffer.check_top() != 1) {
       global_serial_buffer.get();
     }
   }
 
-  if (global_serial_buffer.len()>=7) {
-      global_serial_buffer.get();
-      mirror_status.rv_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
-      mirror_status.lv_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
-      mirror_status.rh_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
-      mirror_status.lh_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
-      mirror_status.angle = Byte2Val(global_serial_buffer.get(), -1, 1);
-      mirror_status.dist = Byte2Val(global_serial_buffer.get(), 0, 1);
-      mirror_status.change_flag = true;
+  if (global_serial_buffer.len() >= 7) {
+    global_serial_buffer.get();
+    mirror_status.rv_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+    mirror_status.lv_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+    mirror_status.rh_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+    mirror_status.lh_hand = Byte2Val(global_serial_buffer.get(), 0, 1);
+    mirror_status.angle = Byte2Val(global_serial_buffer.get(), -1, 1);
+    mirror_status.dist = Byte2Val(global_serial_buffer.get(), 0, 1);
+    mirror_status.change_flag = true;
   }
 }
 void fight() {
-  if(Serial.available()){
+  if (Serial.available()) {
     char b = Serial.read();
-    if(b==0){
+    if (b == 0) {
       return;
     }
     global_serial_buffer.add(b);
   }
-  
 
-  if(global_serial_buffer.len()) {
-    if(global_serial_buffer.check_top()!=1) {
+
+  if (global_serial_buffer.len()) {
+    if (global_serial_buffer.check_top() != 1) {
       global_serial_buffer.get();
     }
   }
-    
-  if (global_serial_buffer.len()>=3) {
-      global_serial_buffer.get();
-      fight_status.angle = Byte2Val(global_serial_buffer.get(), -1, 1);
-      fight_status.dist = Byte2Val(global_serial_buffer.get(), 0, 1);
-      fight_status.change_flag = true;
+
+  if (global_serial_buffer.len() >= 3) {
+    global_serial_buffer.get();
+    fight_status.angle = Byte2Val(global_serial_buffer.get(), -1, 1);
+    fight_status.dist = Byte2Val(global_serial_buffer.get(), 0, 1);
+    fight_status.change_flag = true;
   }
 }
+void fight_delay(uint32_t ms) {
+  uint32_t time = millis();
+  while (millis() - time < ms) {
+    fight();
+  }
+}
+
 }
 #endif

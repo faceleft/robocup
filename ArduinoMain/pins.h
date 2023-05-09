@@ -19,5 +19,7 @@
   #define DIODE_RED_ADDR 5
   #define DIODE_GREEN_ADDR 6
   #define DIODE_BLUE_ADDR 7
+
+  #define IR 2
   
 #endif

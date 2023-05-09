@@ -25,6 +25,7 @@ void set_global_state(t_state state) {
         servoF(0, servo_rv);
         servoF(0, servo_lh);
         servoF(0, servo_lv);
+        digitalWrite(IR, HIGH);
         break;
       }
     case MIRROR: {
@@ -36,6 +37,7 @@ void set_global_state(t_state state) {
         servoF(0, servo_rv);
         servoF(0, servo_lh);
         servoF(0, servo_lv);
+        digitalWrite(IR, HIGH);
         break;
       }
     case FIGHT: {
@@ -43,10 +45,14 @@ void set_global_state(t_state state) {
         diodeColor(512, 0, 0);
         //Serial.println("#start fight");
         tft_print("#start fight");
+        motors.IntWrite(0, 0);
+        servoF(0, servo_belt);
         servoF(0, servo_rh);
         servoF(0, servo_rv);
         servoF(0, servo_lh);
         servoF(0, servo_lv);
+        servoF(0, servo_neck);
+        digitalWrite(IR, LOW);
         break;
       }
   }

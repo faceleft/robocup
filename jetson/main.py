@@ -17,69 +17,6 @@ arduino.connect('/dev/ttyUSB0')
 time.sleep(10)
 print(arduino.heartbeat())
 
-class Controller:
-    controller = None
-    axis_data = None
-    button_data = None
-    hat_data = None
-    def __init__(self, num):
-        pygame.init()
-        pygame.joystick.init()
-        self.controller = pygame.joystick.Joystick(num)
-        self.controller.init()
-    def listen(self, num):
-        """Listen for events to happen"""
-        if not self.axis_data:
-            self.axis_data = {}
-
-        if not self.button_data:
-            self.button_data = {}
-            for i in range(self.controller.get_numbuttons()):
-                self.button_data[i] = False
-
-        if not self.hat_data:
-            self.hat_data = {}
-            for i in range(self.controller.get_numhats()):
-                self.hat_data[i] = (0, 0)
-        for event in pygame.event.get():
-            if event.type == pygame.JOYAXISMOTION:
-                self.axis_data[event.axis] = round(event.value,2)
-            elif event.type == pygame.JOYBUTTONDOWN:
-                self.button_data[event.button] = True
-            elif event.type == pygame.JOYBUTTONUP:
-                self.button_data[event.button] = False
-            elif event.type == pygame.JOYHATMOTION:
-                self.hat_data[event.hat] = event.value
-        out = (self.axis_data, self.button_data, self.hat_data)
-        return out[num]
-
-class Vector(list):
-    def __add__(self, other):
-        return Vector(map(lambda x, y: x + y, self, other))
-
-    def __sub__(self, other):
-        return Vector(map(lambda x, y: x - y, self, other))
-
-    def __neg__(self):
-        return Vector(map(lambda x: -x, self))
-
-    def __truediv__(self, other):
-        return Vector(map(lambda x: x / other, self))
-
-    def __mul__(self, other):
-        return Vector(map(lambda x: x * other, self))
-
-    def length(self):
-        return sum(map(lambda x: x ** 2, self)) ** 0.5
-
-    @staticmethod
-    def emptyVector(directions_len):
-        return Vector([0 for _ in range(directions_len)])
-
-    @staticmethod
-    def toVector(scalar, direction):
-        return Vector([i * scalar / Vector(direction).length() for i in direction]) if scalar != 0 else Vector().emptyVector(len(direction))
-
 def world_landmarks(marks, res):
     dots = [Vector([i.x, i.y * (res[1] / res[0]), i.z / 2]) for i in marks]
     visibility = [i.visibility for i in marks]
@@ -89,7 +26,7 @@ def world_landmarks(marks, res):
     for c, dot in enumerate(dots):
         dots[c] = (centre - dot) * k
     return dots, visibility, k, centre[0]
-
+"""
 def view(wlms, vis):
     res = (800, 600, 1)
     blank = np.zeros(res, dtype='uint8')
@@ -114,7 +51,7 @@ def view(wlms, vis):
     cv2.circle(blank, (50,50), 8, 200, cv2.FILLED)
     cv2.imshow('Pose', blank)
     cv2.waitKey(1)
-
+"""
 def detect(wlms):
     global arduino
     #left = [23, 11, 13]
@@ -160,7 +97,6 @@ def toByte(val, min_, max_):
 def main():
     global cap
     global switch
-    global other_ready
     global final_sign
     prev_time = time.time()
     while True:
@@ -169,9 +105,14 @@ def main():
         inp = serial_monitor()
         if inp == "#complited":
             flag = 0
-        if inp == "start":
+        if inp == "mirror":
             switch=1
             arduino.write("mirror\n")
+        if inp == "fight":
+            switch=2
+            arduino.write("fight\n")
+        if inp == "reset":
+            switch=0
         #print(inp, flag)
         success, img = cap.read()
         if not success:
@@ -200,8 +141,12 @@ def main():
                     arduino.write("fight\n")
                     switch=2
                 #detect(wlms)
+            if switch == 2:
+                arduino.bytewrite((1).to_bytes(1, "big"))
+                arduino.bytewrite(toByte(centre, 0, 1))
+                arduino.bytewrite(toByte(k/5, 0, 1))
 
-            view(wlms, visible)
+
         frame_time = round(1/(cur_time - prev_time), 1)
         cv2.putText(img, str(frame_time) + "fps", (40, 50),
                     cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 0, 255), 2)
@@ -235,20 +180,9 @@ while True:
     
 time.sleep(1)
 detector = pose_module()
-#gamepad = Controller(0)
 switch = 0
-other_ready = False
 final_sign = ''
 
 global_visibility = 0.5
-
-
-rects_left = [((600-60, 10), (600-140, 90)), ((600-140, 10), (600-220, 90)),
-              ((600-60, 90), (600-140, 170)), ((600-140, 90), (600-220, 170)),
-              ((600-60, 170), (600-140, 250)), ((600-140, 170), (600-220, 250))]
-rects_right = [((60, 10), (140, 90)), ((140, 10), (220, 90)),
-              ((60, 90), (140, 170)), ((140, 90), (220, 170)),
-              ((60, 170), (140, 250)), ((140, 170), (220, 250))]              
-
 
 main()

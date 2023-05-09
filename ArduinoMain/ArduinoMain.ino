@@ -76,7 +76,8 @@ void functionManager(String *message) {
 void setup() {
   Serial.begin(PREF_SERIAL_SPEED);
   Serial.setTimeout(PREF_SERIAL_TIMEOUT);
-
+  pinMode(IR, OUTPUT);
+  digitalWrite(IR, HIGH);
   display_init();
   pwm.begin();
 
@@ -89,6 +90,42 @@ void setup() {
 
 void loop() {
   motors.Work();
+  
+  //buttons
+  uint8_t a = buttons_click();
+  if (a) {
+    tft_print("Button " + String(a), 1, 220, 220, 255);
+  }
+  switch (a) {
+    case 0: break;
+
+    case 1: {
+        Serial.println("mirror");
+      } break;
+
+    case 2: {
+        Serial.println("fight");
+      } break;
+
+    case 3: {
+        Serial.println("reset");
+        set_global_state(NONE);      
+      } break;
+
+    case 4: {
+        mv::punch();
+      } break;
+
+    case 5: {
+        mv::r_MAX();
+      } break;
+
+    case 6: {
+        mv::l_MAX();
+      } break;
+  }
+  //end_buttons
+  
   switch (get_global_state()) {
     case MIRROR: {
         mv::mirror();
@@ -98,53 +135,22 @@ void loop() {
           mv::mirror_hands();
           mv::mirror_status.change_flag = false;
         }
-        break;
-    }
+      } break;
+
     case FIGHT: {
         mv::fight();
         if (mv::fight_status.change_flag) {
-          mv::fight_hands();
+          mv::fight_rotate();
+          mv::fight_save_distance();
           mv::fight_status.change_flag = false;
         }
-        break;
-    }
+      } break;
+
     case NONE: {
         if (Serial.available()) {
           analyse(Serial.readString());
         }
-        uint8_t a = buttons_click();
-        if (a) {
-          tft_print("Button " + String(a), 1, 220, 220, 255);
-        }
-        switch (a) {
-          case 0: break;
-          
-          case 1: {
-              Serial.println("start");
-              //mv::r_huk();
-            } break;
-            
-          case 2: {
-              mv::l_huk();
-            } break;
-            
-          case 3: {
-              mv::r_aperkot();
-            } break;
-            
-          case 4: {
-              mv::l_aperkot();
-            } break;
-            
-          case 5: {
-              mv::r_MAX();
-            } break;
-            
-          case 6: {
-              mv::l_MAX();
-            } break;
-        } break;
-        
-      }
+      } break;
   }
+
 }
