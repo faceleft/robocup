@@ -90,6 +90,27 @@ def serial_monitor():
         return arduino.read()
     else: 
         return None
+    
+def find_red_box(img):
+    Lower = np.array([0, 60, 60])
+    Upper = np.array([6, 255, 255])
+    gs_frame = cv2.GaussianBlur(frame, (5, 5), 0)  # Размытие по Гауссу
+    hsv = cv2.cvtColor(gs_frame, cv2.COLOR_BGR2HSV)  # Преобразовать в изображение HSV
+    erode_hsv = cv2.erode(hsv, None, iterations=2)  # Коррозия Грубое разбавление
+    inRange_hsv = cv2.inRange(erode_hsv, Lower, Upper)
+    cnts = cv2.findContours(inRange_hsv.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+    if len(cnts):
+        c = max(cnts, key=cv2.contourArea)
+        rect = cv2.minAreaRect(c)
+        box = cv2.boxPoints(rect)
+        cv2.drawContours(frame, [np.int0(box)], -1, (0, 255, 255), 2)
+        size = cv2.arcLength(box, True)
+        M = cv2.moments(box)
+        cX = int(M["m10"] / M["m00"])
+        #cY = int(M["m01"] / M["m00"])
+        return cX, size
+
+
 def toByte(val, min_, max_):
     return (round(min(max(val-min_, 0), max_-min_)*(253.0/(max_-min_)))+2).to_bytes(1, "big")
 
@@ -142,8 +163,9 @@ def main():
                     switch=2
                 #detect(wlms)
             if switch == 2:
+                box_centre, box_k =  find_red_box(img)
                 arduino.bytewrite((1).to_bytes(1, "big"))
-                arduino.bytewrite(toByte(centre, 0, 1))
+                arduino.bytewrite(toByte(box_centre, 0, dispW))
                 arduino.bytewrite(toByte(k/5, 0, 1))
 
 
