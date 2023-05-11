@@ -248,11 +248,40 @@ void mirror_hands() {
   }
 }
 
+void punch();
+void fight_delay(uint32_t ms);
 void fight_rotate() {
-  if (fight_status.save_distance_flag == false) {
-    float neck_x = computePID(fight_status.angle, 0, 3, 0, 0, 0.1, -1, 1, 2);
-    motors.IntWrite(-100 * neck_x, 100 * neck_x);
+  int k;
+  static uint32_t timer = millis();
+  
+  if (fight_status.dist > 0.15) {
+    k = -100;
   }
+  else {
+    k = 0;
+    if (millis() - timer > 6000) {
+      motors.IntWrite(0, 0);
+      punch();
+      fight_delay(1000);
+      timer = millis();
+    }
+  }
+
+  
+
+  /*
+    static uint32_t timer2 = millis()-500;
+    if(millis()-timer2 > 6000){
+     motors.IntWrite(-130, -130);
+     fight_delay(1000);
+     motors.IntWrite(-0, -0);
+     timer2 = millis();
+    }
+  */
+
+  float neck_x = computePID(fight_status.angle, 0, 4, 0, 0, 0.1, -1, 1, 2);
+
+  motors.IntWrite(k + (neck_x * -100), k + (neck_x * 100));
 }
 
 void punch() {

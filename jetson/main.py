@@ -22,7 +22,7 @@ def world_landmarks(marks, res):
     visibility = [i.visibility for i in marks]
     centre = (dots[11] + dots[12] + dots[23] + dots[24]) / 4
     k = (dots[11] - dots[12]).length()
-    k = 0.26/(k-0.04)
+    k = 0.26/(k)
     for c, dot in enumerate(dots):
         dots[c] = (centre - dot) * k
     return dots, visibility, k, centre[0]
@@ -91,7 +91,7 @@ def serial_monitor():
     else: 
         return None
     
-def find_red_box(img):
+def find_red_box(frame):
     Lower = np.array([0, 60, 60])
     Upper = np.array([6, 255, 255])
     gs_frame = cv2.GaussianBlur(frame, (5, 5), 0)  # Размытие по Гауссу
@@ -106,13 +106,22 @@ def find_red_box(img):
         cv2.drawContours(frame, [np.int0(box)], -1, (0, 255, 255), 2)
         size = cv2.arcLength(box, True)
         M = cv2.moments(box)
-        cX = int(M["m10"] / M["m00"])
-        #cY = int(M["m01"] / M["m00"])
-        return cX, size
+        try:
+            cX = int(M["m10"] / M["m00"])
+            #cY = int(M["m01"] / M["m00"])
+            size = 126/size
+            return cX, size
+        except:
+            return 150, 1
+    else:
+        return 150, 1
 
 
 def toByte(val, min_, max_):
     return (round(min(max(val-min_, 0), max_-min_)*(253.0/(max_-min_)))+2).to_bytes(1, "big")
+
+def on_change(value):
+    print(value)
 
 
 def main():
@@ -129,9 +138,11 @@ def main():
         if inp == "mirror":
             switch=1
             arduino.write("mirror\n")
+            time.sleep(0.5)
         if inp == "fight":
             switch=2
             arduino.write("fight\n")
+            time.sleep(0.5)
         if inp == "reset":
             switch=0
         #print(inp, flag)
@@ -141,6 +152,7 @@ def main():
         
         img = detector.process(img)
         lms = detector.get_landmarks()
+        box_centre, box_k =  find_red_box(img)
         if lms:
             wlms, visible, k, centre = world_landmarks(lms, (int(cap.get(3)), int(cap.get(4))))
             if switch == 1:
@@ -149,7 +161,7 @@ def main():
                 min_=20
                 max_=180
                 #print((round(min(max(angle_r-min_, 0), max_-min_)*(253.0/(max_-min_)))+2))
-                print(wlms[16][2]-wlms[12][2], wlms[15][2]-wlms[11][2])
+                #print(wlms[16][2]-wlms[12][2], wlms[15][2]-wlms[11][2])
                 arduino.bytewrite((1).to_bytes(1, "big"))
                 arduino.bytewrite(toByte(wlms[15][2]-wlms[11][2], 0, 1))
                 arduino.bytewrite(toByte(wlms[16][2]-wlms[12][2], 0, 1))
@@ -162,11 +174,10 @@ def main():
                     arduino.write("fight\n")
                     switch=2
                 #detect(wlms)
-            if switch == 2:
-                box_centre, box_k =  find_red_box(img)
-                arduino.bytewrite((1).to_bytes(1, "big"))
-                arduino.bytewrite(toByte(box_centre, 0, dispW))
-                arduino.bytewrite(toByte(k/5, 0, 1))
+        if switch == 2:
+            arduino.bytewrite((1).to_bytes(1, "big"))
+            arduino.bytewrite(toByte(box_centre/300, 0, 1))
+            arduino.bytewrite(toByte(box_k/5, 0, 1))
 
 
         frame_time = round(1/(cur_time - prev_time), 1)
@@ -206,5 +217,7 @@ switch = 0
 final_sign = ''
 
 global_visibility = 0.5
+
+
 
 main()

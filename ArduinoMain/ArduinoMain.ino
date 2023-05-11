@@ -141,7 +141,7 @@ void loop() {
         mv::fight();
         if (mv::fight_status.change_flag) {
           mv::fight_rotate();
-          mv::fight_save_distance();
+          //mv::fight_save_distance();
           mv::fight_status.change_flag = false;
         }
       } break;
