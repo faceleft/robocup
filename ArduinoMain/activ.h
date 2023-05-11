@@ -254,15 +254,15 @@ void fight_rotate() {
   int k;
   static uint32_t timer = millis();
   
-  if (fight_status.dist > 0.15) {
-    k = -100;
+  if (fight_status.dist > 0.1) {
+    k = -130;
   }
   else {
     k = 0;
-    if (millis() - timer > 6000) {
+    if (millis() - timer > 3000) {
       motors.IntWrite(0, 0);
       punch();
-      fight_delay(1000);
+      fight_delay(500);
       timer = millis();
     }
   }

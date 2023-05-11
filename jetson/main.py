@@ -131,7 +131,7 @@ def main():
     prev_time = time.time()
     while True:
         cur_time = time.time()
-        
+        success, img = cap.read()
         inp = serial_monitor()
         if inp == "#complited":
             flag = 0
@@ -145,6 +145,11 @@ def main():
             time.sleep(0.5)
         if inp == "reset":
             switch=0
+        if inp == "screenshot":
+            cv2.imwrite(f"screenshots/{cur_time}.jpg", img)
+            arduino.write("flash\n")
+            time.sleep(0.5)
+
         #print(inp, flag)
         success, img = cap.read()
         if not success:

@@ -66,6 +66,10 @@ void functionManager(String *message) {
     set_global_state(MIRROR);
   } else if (command == "fight") {
     set_global_state(FIGHT);
+  } else if (command == "flash") {
+    diodeColor(1024, 1024, 1024);
+    delay(100);
+    diodeColor(0, 0, 512);
   }
   else {
     tft_print("!unknown command: ", 0, 255, 0, 0);
@@ -117,7 +121,8 @@ void loop() {
       } break;
 
     case 5: {
-        mv::r_MAX();
+        Serial.println("screenshot");
+        tft_print("screenshot");
       } break;
 
     case 6: {
@@ -130,7 +135,7 @@ void loop() {
     case MIRROR: {
         mv::mirror();
         if (mv::mirror_status.change_flag) {
-          mv::mirror_save_distance();
+          //mv::mirror_save_distance();
           mv::mirror_rotate();
           mv::mirror_hands();
           mv::mirror_status.change_flag = false;
