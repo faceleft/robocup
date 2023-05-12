@@ -92,8 +92,8 @@ def serial_monitor():
         return None
     
 def find_red_box(frame):
-    Lower = np.array([0, 60, 60])
-    Upper = np.array([6, 255, 255])
+    Lower = np.array([0, 125, 120])
+    Upper = np.array([10, 205, 243])
     gs_frame = cv2.GaussianBlur(frame, (5, 5), 0)  # Размытие по Гауссу
     hsv = cv2.cvtColor(gs_frame, cv2.COLOR_BGR2HSV)  # Преобразовать в изображение HSV
     erode_hsv = cv2.erode(hsv, None, iterations=2)  # Коррозия Грубое разбавление
