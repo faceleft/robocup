@@ -201,7 +201,7 @@ void set_left() {
   servoF(-1, servo_belt);
 }
 void mirror_save_distance() {
-  if (mirror_status.dist > 0.5) {
+  if (mirror_status.dist > 0.4) {
     motors.IntWrite(-160, -160);
   }
   else if (mirror_status.dist < 0.3) {
@@ -291,7 +291,7 @@ void punch() {
     l_aperkot,
     l_huk,
     r_aperkot,
-    r_MAX,
+    //hjjjjjgr_MAX,
     l_aperkot,
     l_huk,
   };
@@ -300,6 +300,7 @@ void punch() {
 }
 
 void fight_delay(uint32_t ms);
+
 void fight_save_distance() {
   if (fight_status.dist > 0.5) {
     motors.IntWrite(-160, -160);

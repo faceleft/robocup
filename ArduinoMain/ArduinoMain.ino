@@ -1,3 +1,4 @@
+
 #include "pins.h"
 #include "settings.h"
 #include "buttons.h"
@@ -6,6 +7,9 @@
 #include "servo.h"
 #include "activ.h"
 #include "display.h"
+
+#define try(func) {tft_print("!try '" #func "'", 0, 255, 128, 255);func;tft_print(" DONE", 1, 128, 255, 128);}
+
 #include "error.h"
 #include "global_state.h"
 #include <SoftwareSerial.h>
@@ -83,13 +87,17 @@ void setup() {
   pinMode(IR, OUTPUT);
   digitalWrite(IR, HIGH);
   display_init();
-  pwm.begin();
-
-  pwm.setPWMFreq(60);
   tft_print("#Start!", 1, 220, 255, 220);
+  
+  pwm.begin();
+  tft_print("#Start1!", 1, 220, 255, 220);
+  
+  pwm.setPWMFreq(60);
+  
   pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
   mv::none();
   set_global_state(NONE);
+  tft_print("#end of void setup()", 1, 220, 255, 220);
 }
 
 void loop() {
@@ -104,6 +112,7 @@ void loop() {
     case 0: break;
 
     case 1: {
+        delay(2000);
         Serial.println("mirror");
       } break;
 

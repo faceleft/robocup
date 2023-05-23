@@ -154,7 +154,7 @@ def main():
         success, img = cap.read()
         if not success:
             continue
-        
+
         img = detector.process(img)
         lms = detector.get_landmarks()
         box_centre, box_k =  find_red_box(img)
@@ -174,7 +174,7 @@ def main():
                 arduino.bytewrite(toByte(angle_l, 20, 180))
                 arduino.bytewrite(toByte(centre, 0, 1))
                 arduino.bytewrite(toByte(k/5, 0, 1))
-                if angle_r>160 and angle_l>160:
+                if angle_r>160 and angle_l>160 and 0:
                     arduino.bytewrite((0).to_bytes(1, "big"))
                     arduino.write("fight\n")
                     switch=2
@@ -196,7 +196,7 @@ dispW = 400
 dispH = 240
 i = 0
 
-while True: 
+while True:
     cap = cv2.VideoCapture(i)
     font=cv2.FONT_HERSHEY_SIMPLEX
     cap.set(cv2.CAP_PROP_FRAME_WIDTH,dispW)
@@ -215,7 +215,7 @@ while True:
     else:
         print(f'Camera resolution: {width}x{height}, FPS: {fps}')
         break
-    
+
 time.sleep(1)
 detector = pose_module()
 switch = 0
