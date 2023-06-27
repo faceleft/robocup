@@ -8,3 +8,5 @@
 #include "src/display.h"
 #include "src/error.h"
 #include "src/global_state.h"
+#include "src/serial.h"
+#include "src/ir.h"

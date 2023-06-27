@@ -1,8 +1,14 @@
 #include "global_state.h"
 
+#include "ir.h"
+
 t_state __global_state;
 
 static_queue<char, GLOBAL_SERIAL_BUFFER_SIZE> global_serial_buffer(error);
+
+t_state get_global_state() {
+  return __global_state;
+}
 
 void set_global_state(t_state state)
 {
@@ -48,7 +54,7 @@ void set_global_state(t_state state)
     servoF(0, servo_lh);
     servoF(0, servo_lv);
     servoF(0, servo_neck);
-    digitalWrite(IR, LOW);
+    ir_on();
     break;
   }
   }

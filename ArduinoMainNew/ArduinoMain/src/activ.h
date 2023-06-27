@@ -1,4 +1,3 @@
-#include "HardwareSerial.h"
 #ifndef activ_h
 #define activ_h
 #include "servo.h"
@@ -9,8 +8,7 @@
 
 namespace mv
 {
-  struct
-  {
+  struct {
     float rv_hand;
     float lv_hand;
     float rh_hand;
@@ -21,8 +19,7 @@ namespace mv
     bool rotate_flag = false;
   } mirror_status;
 
-  struct
-  {
+  struct {
     float angle;
     float dist;
     bool change_flag = false;

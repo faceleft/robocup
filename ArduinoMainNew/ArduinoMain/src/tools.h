@@ -12,11 +12,6 @@ float voltage(uint8_t pin);
 
 void servoF(float angle, const Servo &s);
 
-namespace func
-{
-  float sine(float x);
-}
-
 float Byte2Val(byte val, float min_, float max_);
 
 void diodeColor(int red, int green, int blue);

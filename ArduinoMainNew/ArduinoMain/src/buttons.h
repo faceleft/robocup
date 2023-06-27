@@ -1,11 +1,13 @@
 #ifndef buttons_h
 #define buttons_h
-#include <Arduino.h>
-#include "pins.h"
-#include "settings.h"
 
-uint8_t buttons_click();
-
-uint8_t buttons_now();
+void buttons_task(\ //NULL если нет действий
+    void (*button1_handler)(void),\
+    void (*button2_handler)(void),\
+    void (*button3_handler)(void),\
+    void (*button4_handler)(void),\
+    void (*button5_handler)(void),\
+    void (*button6_handler)(void),\
+);
 
 #endif

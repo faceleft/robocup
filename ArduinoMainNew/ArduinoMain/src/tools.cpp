@@ -25,8 +25,6 @@ void servoF(float angle, const Servo &s)
   pwm.setPWM(s.addr, 0, zn);
 }
 
-float func::sine(float x) { return 0.5 * (sin((-PI) / 2 + PI * x) + 1); }
-
 float Byte2Val(byte val, float min_, float max_)
 {
   return (((float)(val - 2)) / 253) * (max_ - min_) + min_;

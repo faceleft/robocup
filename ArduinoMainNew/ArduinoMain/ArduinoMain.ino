@@ -1,60 +1,28 @@
-
 #include "robot.h"
-
-void functionManager(String *message);
-
-void analyse(String text) {
-  String message[PREF_STRING_BUFFER_LEN];
-  String Word;
-  int len = text.length();
-  const char sep = ' ';
-  bool complited = false;
-  text[len - 1] = sep;
-  int counter = 0;
-  //*****************
-  for (int i = 0; i < len; i++) {
-    char sim = text[i];
-
-    if (sim == sep) {
-      if (Word == "-c") {
-        complited = true;
-        Word = "";
-      } else {
-        message[counter] = Word;
-        counter++;
-        Word = "";
-      }
-    } else {
-      Word += sim;
-    }
-  }
-  //****************
-
-  functionManager(message);
-  if (complited) {
-    Serial.println("complited");
-  }
-}
 
 void functionManager(String *message) {
   String& command = message[0];
   if (command == "heartbeat") {
     tft_print("heartbeat", 1, 220, 220, 255);
     Serial.println("heartbeat");
-  } else if (command == "print") {
+  } 
+  else if (command == "print") {
     tft_print("Jetson: ", 0, 255, 220, 255);
     for (int i = 1; i < PREF_STRING_BUFFER_LEN; i++) {
       if (message[i] != "") tft_print(message[i] + " ", 0);
     }
     tft_print(String(""), 1);
-
-  } else if (command == "motors") {
+  } 
+  else if (command == "motors") {
     motors.SetTarget((message[1]).toInt(), (message[2]).toInt());
-  } else if (command == "mirror") {
+  } 
+  else if (command == "mirror") {
     set_global_state(MIRROR);
-  } else if (command == "fight") {
+  } 
+  else if (command == "fight") {
     set_global_state(FIGHT);
-  } else if (command == "flash") {
+  } 
+  else if (command == "flash") {
     diodeColor(1024, 1024, 1024);
     delay(100);
     diodeColor(0, 0, 512);
@@ -68,8 +36,7 @@ void functionManager(String *message) {
 void setup() {
   Serial.begin(PREF_SERIAL_SPEED);
   Serial.setTimeout(PREF_SERIAL_TIMEOUT);
-  pinMode(IR, OUTPUT);
-  digitalWrite(IR, HIGH);
+  ir_setup(IR);
   display_init();
   tft_print("#Start!", 1, 220, 255, 220);
   
@@ -81,49 +48,40 @@ void setup() {
   pwm.setPWM(SERVO_BELT_ADDR, 0 , SERVO_BELT_MEAN);
   mv::none();
   set_global_state(NONE);
-  tft_print("#end of void setup()", 1, 220, 255, 220);
 }
+
+void button1_handler(){
+    delay(2000);
+    Serial.println("mirror");
+}
+void button2_handler(){
+    Serial.println("fight");
+}
+void button3_handler(){
+    Serial.println("reset");
+    set_global_state(NONE);
+}
+void button4_handler(){
+    mv::punch();
+}
+void button5_handler(){
+    Serial.println("screenshot");
+    tft_print("screenshot");
+}
+
 
 void loop() {
   motors.Work();
-  
-  //buttons
-  uint8_t a = buttons_click();
-  if (a) {
-    tft_print("Button " + String(a), 1, 220, 220, 255);
-  }
-  switch (a) {
-    case 0: break;
 
-    case 1: {
-        delay(2000);
-        Serial.println("mirror");
-      } break;
+  buttons_task(
+    button1_handler,\
+    button2_handler,\
+    button3_handler,\
+    button4_handler,\
+    button5_handler,\
+    NULL,\
+  );
 
-    case 2: {
-        Serial.println("fight");
-      } break;
-
-    case 3: {
-        Serial.println("reset");
-        set_global_state(NONE);      
-      } break;
-
-    case 4: {
-        mv::punch();
-      } break;
-
-    case 5: {
-        Serial.println("screenshot");
-        tft_print("screenshot");
-      } break;
-
-    case 6: {
-        mv::l_MAX();
-      } break;
-  }
-  //end_buttons
-  
   switch (get_global_state()) {
     case MIRROR: {
         mv::mirror();
@@ -145,10 +103,9 @@ void loop() {
       } break;
 
     case NONE: {
-        if (Serial.available()) {
-          analyse(Serial.readString());
-        }
+        serial_task(functionManager);
       } break;
   }
 
 }
+

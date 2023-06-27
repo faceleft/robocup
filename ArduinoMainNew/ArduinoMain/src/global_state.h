@@ -8,19 +8,16 @@
 
 #define GLOBAL_SERIAL_BUFFER_SIZE 100
 
-typedef enum
-{
+typedef enum {
   MIRROR,
   FIGHT,
   NONE,
 } t_state;
 
-extern t_state __global_state;
-
 extern static_queue<char, GLOBAL_SERIAL_BUFFER_SIZE> global_serial_buffer;
 
 void set_global_state(t_state state);
 
-#define get_global_state() (__global_state)
+t_state get_global_state();
 
 #endif
