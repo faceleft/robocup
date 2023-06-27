@@ -26,7 +26,7 @@ void display_init()
   display.setColor(VGA_GREEN);
 }
 
-void tft_print(String s = "", bool ln = 1, uint8_t r = 255, uint8_t g = 255, uint8_t b = 255)
+void tft_print(String s, bool ln, uint8_t r, uint8_t g, uint8_t b)
 {
   static int n = 0;
   static int m = 0;

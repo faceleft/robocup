@@ -6,6 +6,8 @@
 #include "settings.h"
 #include "servo.h"
 
+#define try(func) {tft_print("!try '" #func "'", 0, 255, 128, 255);func;tft_print(" DONE", 1, 128, 255, 128);}
+
 float voltage(uint8_t pin);
 
 void servoF(float angle, const Servo &s);

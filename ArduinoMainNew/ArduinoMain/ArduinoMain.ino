@@ -1,21 +1,5 @@
 
-#include "pins.h"
-#include "settings.h"
-#include "buttons.h"
-#include "tools.h"
-#include "motors.h"
-#include "servo.h"
-#include "activ.h"
-#include "display.h"
-
-#define try(func) {tft_print("!try '" #func "'", 0, 255, 128, 255);func;tft_print(" DONE", 1, 128, 255, 128);}
-
-#include "error.h"
-#include "global_state.h"
-#include <SoftwareSerial.h>
-
-#include <Wire.h>
-
+#include "robot.h"
 
 void functionManager(String *message);
 
