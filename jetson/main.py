@@ -192,7 +192,7 @@ def main():
         cv2.waitKey(1)
         prev_time = cur_time
 
-dispW = 400
+dispW = 320
 dispH = 240
 i = 0
 
