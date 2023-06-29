@@ -2,8 +2,6 @@
 
 #include "Arduino.h"
 
-const uint8_t PIN_VREF = A0;
-const uint8_t PIN_VBATTERY = A1;
 const uint8_t PIN_BUTTONS = A2;
 
 const uint8_t PIN_LED_SCK = 7;

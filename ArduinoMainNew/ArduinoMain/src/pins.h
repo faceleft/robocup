@@ -3,11 +3,9 @@
 
 #include <stdint.h>
 
-extern const uint8_t PIN_VREF;
-extern const uint8_t PIN_VBATTERY;
 extern const uint8_t PIN_BUTTONS;
 
-extern const uint8_t PIN_LED_SCK;
+extern const uint8_t PIN_LED_SCK; //экранчик
 extern const uint8_t PIN_LED_MOSI;
 extern const uint8_t PIN_LED_DC;
 extern const uint8_t PIN_LED_RESET;

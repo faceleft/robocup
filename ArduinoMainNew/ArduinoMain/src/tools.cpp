@@ -4,12 +4,6 @@
 #include "settings.h"
 #include "servo.h"
 
-float voltage(uint8_t pin)
-{
-  // return ((float)analogRead(pin) * PREF_VREF) / (float)analogRead(PIN_VREF); //когда будет аппаратно
-  return ((float)analogRead(pin) * PREF_VREF) / 512;
-}
-
 float Byte2Val(byte val, float min_, float max_)
 {
   return (((float)(val - 2)) / 253) * (max_ - min_) + min_;

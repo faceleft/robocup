@@ -2,7 +2,11 @@
 
 #include <Arduino.h>
 #include "pins.h"
-#include "settings.h"
+
+const float PREF_BUTTONS_NUM = 6;
+const float PREF_BUTTONS_MAX_LEVEL = 1024;
+const float PREF_BUTTONS_ACCURACY = 3; //%
+const float PREF_BUTTONS_DELAY = 500;  // ms
 
 typedef enum
 {

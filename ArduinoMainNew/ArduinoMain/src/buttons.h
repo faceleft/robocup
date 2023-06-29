@@ -1,7 +1,12 @@
 #ifndef ROBOT_BUTTONS_H
 #define ROBOT_BUTTONS_H
 
-// NULL если нет действий
+/*
+должна быть запущена в void loop()
+аргументы - функции которые вызываются при 
+нажатии соответствующей кнопки, 
+если функции нет передать NULL
+*/
 void buttons_task(\
     void (*button1_handler)(void),\
     void (*button2_handler)(void),\

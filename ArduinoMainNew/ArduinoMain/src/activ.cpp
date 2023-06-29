@@ -311,31 +311,6 @@ void mv::punch()
   i = (i + 1) % (sizeof(mvs) / sizeof(mvs[0]));
 }
 
-void mv::fight_save_distance()
-{
-  if (fight_status.dist > 0.5)
-  {
-    motors.IntWrite(-160, -160);
-    fight_status.save_distance_flag = true;
-  }
-  else if (fight_status.dist < 0.3)
-  {
-    motors.IntWrite(160, 160);
-    fight_status.save_distance_flag = true;
-  }
-  else
-  {
-
-    if (fight_status.save_distance_flag)
-    {
-      motors.IntWrite(0, 0);
-      punch();
-      fight_delay(1000);
-      fight_status.save_distance_flag = false;
-    }
-  }
-}
-
 void mv::mirror()
 {
   if (Serial.available())
