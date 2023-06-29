@@ -1,10 +1,7 @@
-#ifndef GLOBAL_STATE_H
-#define GLOBAL_STATE_H
+#ifndef ROBOT_GLOBAL_STATE_H
+#define ROBOT_GLOBAL_STATE_H
+
 #include "structures/static_queue.h"
-#include "error.h"
-#include "servo.h"
-#include "tools.h"
-#include "motors.h"
 
 #define GLOBAL_SERIAL_BUFFER_SIZE 100
 

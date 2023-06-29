@@ -1,5 +1,7 @@
 #include "pins.h"
 
+#include "Arduino.h"
+
 const uint8_t PIN_VREF = A0;
 const uint8_t PIN_VBATTERY = A1;
 const uint8_t PIN_BUTTONS = A2;
@@ -19,4 +21,4 @@ const uint8_t DIODE_RED_ADDR = 5;
 const uint8_t DIODE_GREEN_ADDR = 6;
 const uint8_t DIODE_BLUE_ADDR = 7;
 
-const uint8_t IR = 2;
+const uint8_t PIN_IR = 2;

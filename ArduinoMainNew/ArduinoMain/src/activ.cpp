@@ -1,100 +1,106 @@
 #include "activ.h"
 
+#include "servo.h"
+#include "motors.h"
+#include "display.h"
+#include "tools.h"
+#include "global_state.h"
+
 void mv::none()
 {
   motors.IntWrite(0, 0);
   motors.SetTarget(0, 0);
-  servoF(0, servo_belt);
-  servoF(0, servo_rh);
-  servoF(0, servo_rv);
-  servoF(0, servo_lh);
-  servoF(0, servo_lv);
-  servoF(0, servo_neck);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_rh);
+  servo_set_float(0, servo_rv);
+  servo_set_float(0, servo_lh);
+  servo_set_float(0, servo_lv);
+  servo_set_float(0, servo_neck);
 }
 
 void mv::r_huk()
 {
-  servoF(-0.5, servo_belt);
-  servoF(0.5, servo_neck_like_belt);
+  servo_set_float(-0.5, servo_belt);
+  servo_set_float(0.5, servo_neck_like_belt);
 
-  servoF(0.85, servo_rh);
-  servoF(-1, servo_rv);
+  servo_set_float(0.85, servo_rh);
+  servo_set_float(-1, servo_rv);
 
   delay(200);
-  servoF(0.75, servo_rv);
-  servoF(1, servo_belt);
-  servoF(-1, servo_neck_like_belt);
+  servo_set_float(0.75, servo_rv);
+  servo_set_float(1, servo_belt);
+  servo_set_float(-1, servo_neck_like_belt);
   delay(400);
-  servoF(0, servo_belt);
-  servoF(0, servo_neck_like_belt);
-  servoF(0, servo_rh);
-  servoF(0, servo_rv);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_neck_like_belt);
+  servo_set_float(0, servo_rh);
+  servo_set_float(0, servo_rv);
 }
 
 void mv::l_huk()
 {
-  servoF(0.5, servo_belt);
-  servoF(-0.5, servo_neck_like_belt);
-  servoF(0.85, servo_lh);
-  servoF(-1, servo_lv);
+  servo_set_float(0.5, servo_belt);
+  servo_set_float(-0.5, servo_neck_like_belt);
+  servo_set_float(0.85, servo_lh);
+  servo_set_float(-1, servo_lv);
 
   delay(200);
-  servoF(0.75, servo_lv);
-  servoF(-1, servo_belt);
-  servoF(1, servo_neck_like_belt);
+  servo_set_float(0.75, servo_lv);
+  servo_set_float(-1, servo_belt);
+  servo_set_float(1, servo_neck_like_belt);
   delay(400);
-  servoF(0, servo_belt);
-  servoF(0, servo_neck_like_belt);
-  servoF(0, servo_lh);
-  servoF(0, servo_lv);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_neck_like_belt);
+  servo_set_float(0, servo_lh);
+  servo_set_float(0, servo_lv);
 }
 
 void mv::r_aperkot()
 {
-  servoF(-1, servo_rv);
-  servoF(-0.15, servo_belt);
-  servoF(0.15, servo_neck_like_belt);
+  servo_set_float(-1, servo_rv);
+  servo_set_float(-0.15, servo_belt);
+  servo_set_float(0.15, servo_neck_like_belt);
   delay(100);
-  servoF(1, servo_rv);
-  servoF(0.6, servo_belt);
-  servoF(-0.6, servo_neck_like_belt);
+  servo_set_float(1, servo_rv);
+  servo_set_float(0.6, servo_belt);
+  servo_set_float(-0.6, servo_neck_like_belt);
   delay(400);
-  servoF(0, servo_rv);
-  servoF(0, servo_belt);
-  servoF(0, servo_neck_like_belt);
+  servo_set_float(0, servo_rv);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_neck_like_belt);
 }
 
 void mv::l_aperkot()
 {
-  servoF(-1, servo_lv);
-  servoF(0.15, servo_belt);
-  servoF(-0.15, servo_neck_like_belt);
+  servo_set_float(-1, servo_lv);
+  servo_set_float(0.15, servo_belt);
+  servo_set_float(-0.15, servo_neck_like_belt);
   delay(100);
-  servoF(1, servo_lv);
-  servoF(-0.6, servo_belt);
-  servoF(0.6, servo_neck_like_belt);
+  servo_set_float(1, servo_lv);
+  servo_set_float(-0.6, servo_belt);
+  servo_set_float(0.6, servo_neck_like_belt);
   delay(400);
-  servoF(0, servo_lv);
-  servoF(0, servo_belt);
-  servoF(0, servo_neck_like_belt);
+  servo_set_float(0, servo_lv);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_neck_like_belt);
 }
 
 void mv::meln()
 {
-  servoF(1, servo_rh);
-  servoF(1, servo_lh);
+  servo_set_float(1, servo_rh);
+  servo_set_float(1, servo_lh);
   delay(300);
-  servoF(-1, servo_belt);
-  servoF(1, servo_neck_like_belt);
+  servo_set_float(-1, servo_belt);
+  servo_set_float(1, servo_neck_like_belt);
   delay(300);
-  servoF(1, servo_belt);
-  servoF(-1, servo_neck_like_belt);
+  servo_set_float(1, servo_belt);
+  servo_set_float(-1, servo_neck_like_belt);
   delay(600);
-  servoF(0, servo_belt);
-  servoF(0, servo_neck_like_belt);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_neck_like_belt);
   delay(300);
-  servoF(0, servo_rh);
-  servoF(0, servo_lh);
+  servo_set_float(0, servo_rh);
+  servo_set_float(0, servo_lh);
 }
 
 void mv::r_MAX()
@@ -102,22 +108,22 @@ void mv::r_MAX()
   motors.IntWrite(64, -64);
   for (float i = 0; i < 200; i++)
   {
-    servoF(-(i / 200), servo_belt);
-    servoF(3 * (i / 200), servo_rh);
-    servoF(-(i / 200), servo_rv);
+    servo_set_float(-(i / 200), servo_belt);
+    servo_set_float(3 * (i / 200), servo_rh);
+    servo_set_float(-(i / 200), servo_rv);
     delay(5);
   }
   motors.IntWrite(-255, 255);
-  servoF(1, servo_rv);
-  servoF(1, servo_belt);
-  servoF(-1, servo_neck_like_belt);
+  servo_set_float(1, servo_rv);
+  servo_set_float(1, servo_belt);
+  servo_set_float(-1, servo_neck_like_belt);
   delay(400);
   motors.IntWrite(0, 0);
   delay(500);
-  servoF(0, servo_belt);
-  servoF(0, servo_neck_like_belt);
-  servoF(0, servo_rh);
-  servoF(0, servo_rv);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_neck_like_belt);
+  servo_set_float(0, servo_rh);
+  servo_set_float(0, servo_rv);
   motors.IntWrite(64, -64);
   delay(1100);
   motors.IntWrite(0, 0);
@@ -128,22 +134,22 @@ void mv::l_MAX()
   motors.IntWrite(-64, 64);
   for (float i = 0; i < 200; i++)
   {
-    servoF((i / 200), servo_belt);
-    servoF(3 * (i / 200), servo_lh);
-    servoF(-(i / 200), servo_lv);
+    servo_set_float((i / 200), servo_belt);
+    servo_set_float(3 * (i / 200), servo_lh);
+    servo_set_float(-(i / 200), servo_lv);
     delay(5);
   }
   motors.IntWrite(255, -255);
-  servoF(1, servo_lv);
-  servoF(-1, servo_belt);
-  servoF(1, servo_neck_like_belt);
+  servo_set_float(1, servo_lv);
+  servo_set_float(-1, servo_belt);
+  servo_set_float(1, servo_neck_like_belt);
   delay(400);
   motors.IntWrite(0, 0);
   delay(500);
-  servoF(0, servo_belt);
-  servoF(0, servo_neck_like_belt);
-  servoF(0, servo_lh);
-  servoF(0, servo_lv);
+  servo_set_float(0, servo_belt);
+  servo_set_float(0, servo_neck_like_belt);
+  servo_set_float(0, servo_lh);
+  servo_set_float(0, servo_lv);
   motors.IntWrite(-64, 64);
   delay(1100);
   motors.IntWrite(0, 0);
@@ -154,7 +160,7 @@ void mv::tors()
   motors.IntWrite(128, -128);
   for (float i = 0; i < 50; i++)
   {
-    servoF((i / 50), servo_belt);
+    servo_set_float((i / 50), servo_belt);
     delay(7);
   }
   motors.IntWrite(0, 0);
@@ -163,7 +169,7 @@ void mv::tors()
   motors.IntWrite(-128, 128);
   for (float i = 50; i > (-50); i--)
   {
-    servoF((i / 50), servo_belt);
+    servo_set_float((i / 50), servo_belt);
     delay(7);
   }
   motors.IntWrite(0, 0);
@@ -173,7 +179,7 @@ void mv::tors()
 
   for (float i = -50; i < 0; i++)
   {
-    servoF((i / 50), servo_belt);
+    servo_set_float((i / 50), servo_belt);
     delay(7);
   }
   motors.IntWrite(0, 0);
@@ -192,14 +198,14 @@ void mv::mtrs()
 
 void mv::set_right()
 {
-  servoF(1, servo_neck);
-  servoF(1, servo_belt);
+  servo_set_float(1, servo_neck);
+  servo_set_float(1, servo_belt);
 }
 
 void mv::set_left()
 {
-  servoF(-1, servo_neck);
-  servoF(-1, servo_belt);
+  servo_set_float(-1, servo_neck);
+  servo_set_float(-1, servo_belt);
 }
 
 void mv::mirror_save_distance()
@@ -235,8 +241,8 @@ void mv::mirror_rotate()
     // motors.IntWrite(0, 0);
   }
   // tft_print(String(neck_x));
-  servoF(neck_buff, servo_neck);
-  servoF(neck_buff, servo_belt);
+  servo_set_float(neck_buff, servo_neck);
+  servo_set_float(neck_buff, servo_belt);
 
   if (mirror_status.rotate_flag)
   {
@@ -247,11 +253,11 @@ void mv::mirror_rotate()
 
 void mv::mirror_hands()
 {
-  servoF(mirror_status.rh_hand * 2, servo_rh);
-  servoF(mirror_status.lh_hand * 2, servo_lh);
+  servo_set_float(mirror_status.rh_hand * 2, servo_rh);
+  servo_set_float(mirror_status.lh_hand * 2, servo_lh);
 
-  servoF(mirror_status.rv_hand, servo_rv);
-  servoF(mirror_status.lv_hand, servo_lv);
+  servo_set_float(mirror_status.rv_hand, servo_rv);
+  servo_set_float(mirror_status.lv_hand, servo_lv);
 
   if (mirror_status.lh_hand * 160 + 20 >= 130)
   {
@@ -393,9 +399,9 @@ void mv::fight()
   }
 }
 
-void mv::fight_delay(uint32_t ms)
+void mv::fight_delay(unsigned long ms)
 {
-  uint32_t time = millis();
+  unsigned long time = millis();
   while (millis() - time < ms)
   {
     fight();

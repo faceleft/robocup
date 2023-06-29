@@ -1,5 +1,9 @@
 #include "global_state.h"
 
+#include "error.h"
+#include "servo.h"
+#include "tools.h"
+#include "motors.h"
 #include "ir.h"
 
 t_state __global_state;
@@ -21,11 +25,11 @@ void set_global_state(t_state state)
     diodeColor(0, 0, 512);
     // Serial.println("#wait");
     tft_print("#start wait");
-    servoF(0, servo_rh);
-    servoF(0, servo_rv);
-    servoF(0, servo_lh);
-    servoF(0, servo_lv);
-    digitalWrite(IR, HIGH);
+    servo_set_float(0, servo_rh);
+    servo_set_float(0, servo_rv);
+    servo_set_float(0, servo_lh);
+    servo_set_float(0, servo_lv);
+    ir_off();
     break;
   }
   case MIRROR:
@@ -34,11 +38,11 @@ void set_global_state(t_state state)
     diodeColor(0, 512, 0);
     // Serial.println("#start mirror");
     tft_print("#start mirror");
-    servoF(0, servo_rh);
-    servoF(0, servo_rv);
-    servoF(0, servo_lh);
-    servoF(0, servo_lv);
-    digitalWrite(IR, HIGH);
+    servo_set_float(0, servo_rh);
+    servo_set_float(0, servo_rv);
+    servo_set_float(0, servo_lh);
+    servo_set_float(0, servo_lv);
+    ir_off();
     break;
   }
   case FIGHT:
@@ -48,12 +52,12 @@ void set_global_state(t_state state)
     // Serial.println("#start fight");
     tft_print("#start fight");
     motors.IntWrite(0, 0);
-    servoF(0, servo_belt);
-    servoF(0, servo_rh);
-    servoF(0, servo_rv);
-    servoF(0, servo_lh);
-    servoF(0, servo_lv);
-    servoF(0, servo_neck);
+    servo_set_float(0, servo_belt);
+    servo_set_float(0, servo_rh);
+    servo_set_float(0, servo_rv);
+    servo_set_float(0, servo_lh);
+    servo_set_float(0, servo_lv);
+    servo_set_float(0, servo_neck);
     ir_on();
     break;
   }

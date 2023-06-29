@@ -1,16 +1,12 @@
-#ifndef tools_h
-#define tools_h
+#ifndef ROBOT_TOOLS_H
+#define ROBOT_TOOLS_H
+
 #include <Arduino.h>
 
-#include "pins.h"
-#include "settings.h"
-#include "servo.h"
-
-#define try(func) {tft_print("!try '" #func "'", 0, 255, 128, 255);func;tft_print(" DONE", 1, 128, 255, 128);}
+#include "display.h"
+#define try(func) {tft_print("!try '" #func "'", 0, 255, 128, 255); func; tft_print(" DONE", 1, 128, 255, 128);}
 
 float voltage(uint8_t pin);
-
-void servoF(float angle, const Servo &s);
 
 float Byte2Val(byte val, float min_, float max_);
 

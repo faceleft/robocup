@@ -1,9 +1,8 @@
-#ifndef motors_h
-#define motors_h
+#ifndef ROBOT_MOTORS_H
+#define ROBOT_MOTORS_H
+
 #include <Arduino.h>
-#include "settings.h"
-#include "pins.h"
-#include "display.h"
+
 
 class Motors
 {
@@ -16,7 +15,7 @@ public:
   void RawWrite(uint8_t rf, uint8_t rb, uint8_t lf, uint8_t lb);
   void SetTarget(int r, int l);
   void timeout_handler();
-  void Work();
+  void task();
 
 private:
   uint8_t _pin_rf;

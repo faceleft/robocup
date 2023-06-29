@@ -1,10 +1,5 @@
-#ifndef activ_h
-#define activ_h
-#include "servo.h"
-#include "motors.h"
-#include "display.h"
-#include "tools.h"
-#include "global_state.h"
+#ifndef ROBOT_ACTIV_H
+#define ROBOT_ACTIV_H
 
 namespace mv
 {
@@ -49,7 +44,7 @@ namespace mv
   void fight();
   void fight_rotate();
   void fight_save_distance();
-  void fight_delay(uint32_t ms);
+  void fight_delay(unsigned long ms);
 
 }
 #endif

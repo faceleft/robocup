@@ -1,28 +1,13 @@
 #include "tools.h"
 
+#include "pins.h"
+#include "settings.h"
+#include "servo.h"
+
 float voltage(uint8_t pin)
 {
   // return ((float)analogRead(pin) * PREF_VREF) / (float)analogRead(PIN_VREF); //когда будет аппаратно
   return ((float)analogRead(pin) * PREF_VREF) / 512;
-}
-
-void servoF(float angle, const Servo &s)
-{
-  angle = max(-1, min(1, angle));
-  if (s.invert)
-  {
-    angle = -angle;
-  }
-  int zn;
-  if (angle >= 0)
-  {
-    zn = s.mean + angle * (s.max - s.mean);
-  }
-  else
-  {
-    zn = s.mean + angle * (s.mean - s.min);
-  }
-  pwm.setPWM(s.addr, 0, zn);
 }
 
 float Byte2Val(byte val, float min_, float max_)

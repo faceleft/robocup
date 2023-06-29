@@ -1,5 +1,9 @@
 #include "motors.h"
 
+#include "settings.h"
+#include "pins.h"
+#include "display.h"
+
 Motors::Motors(uint8_t pin_rf, uint8_t pin_rb, uint8_t pin_lf, uint8_t pin_lb, int speed)
 {
     _pin_rf = pin_rf;
@@ -49,15 +53,15 @@ void Motors::byTime(int r, int l, uint32_t _time)
 
 void Motors::IntWrite(int r, int l)
 {
-    this->RawWrite(max(0, r), abs(min(0, r)), max(0, l), abs(min(0, l)));
+    this->RawWrite(max(0, min(r,255)), -min(0, max(r,-255)), max(0, min(l,255)), -min(0, max(l, -255)));
 }
 
 void Motors::RawWrite(uint8_t rf, uint8_t rb, uint8_t lf, uint8_t lb)
 {
-    analogWrite(_pin_rf, min(255, rf));
-    analogWrite(_pin_rb, min(255, rb));
-    analogWrite(_pin_lf, min(255, lf));
-    analogWrite(_pin_lb, min(255, lb));
+    analogWrite(_pin_rf, rf);
+    analogWrite(_pin_rb, rb);
+    analogWrite(_pin_lf, lf);
+    analogWrite(_pin_lb, lb);
     this->r_state = (int)rf - (int)rb;
     this->l_state = (int)lf - (int)lb;
 }
@@ -77,10 +81,10 @@ void Motors::timeout_handler()
         tft_print("STOP_BY_TIME");
     }
 }
-void Motors::Work()
+void Motors::task()
 {
     // timeout_handler();
-    uint32_t times = millis() - this->millis_buff;
+    int times = millis() - this->millis_buff;
     if (times >= this->_speed)
     {
         this->millis_buff = millis();

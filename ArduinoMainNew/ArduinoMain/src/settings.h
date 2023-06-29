@@ -1,5 +1,5 @@
-#ifndef settings_h
-#define settings_h
+#ifndef ROBOT_SETTINGS_H
+#define ROBOT_SETTINGS_H
 
 #define PREF_DISPLAY_BIG_FONT // undef to small font
 

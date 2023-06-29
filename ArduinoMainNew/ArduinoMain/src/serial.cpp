@@ -1,8 +1,13 @@
-#include "serial_analyser.h"
+#include "serial.h"
 
 #include "settings.h"
 
-static void analyse(String text, void (*callback)(String*)) {
+void serial_init() {
+  Serial.begin(PREF_SERIAL_SPEED);
+  Serial.setTimeout(PREF_SERIAL_TIMEOUT);
+}
+
+static void analyse(String text, void (*callback)(String[])) {
   String message[PREF_STRING_BUFFER_LEN];
   String Word;
   int len = text.length();
@@ -38,7 +43,7 @@ static void analyse(String text, void (*callback)(String*)) {
   }
 }
 
-void serial_task(void (*callback)(String*)) {
+void serial_task(void (*callback)(String[])) {
     if (Serial.available()) {
         analyse(Serial.readString(), callback);
     }

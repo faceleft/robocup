@@ -14,7 +14,7 @@ extern uint8_t BigFont[];
 extern uint8_t SmallFont[];
 #endif
 
-void display_init()
+void display_setup()
 {
   display.InitLCD();
   display.clrScr();

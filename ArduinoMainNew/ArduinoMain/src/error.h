@@ -1,5 +1,5 @@
-#ifndef error_h
-#define error_h
+#ifndef ROBOT_ERROR_H
+#define ROBOT_ERROR_H
 
 void error(int num);
 

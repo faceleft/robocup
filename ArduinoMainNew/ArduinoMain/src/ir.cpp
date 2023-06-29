@@ -1,19 +1,17 @@
 #include "ir.h"
 
+#include "pins.h"
 #include <Arduino.h>
 
-uint8_t __ir_pin;
-
-void ir_setup(uint8_t ir_pin) {
-  __ir_pin = ir_pin;
-  pinMode(__ir_pin, OUTPUT);
-  digitalWrite(__ir_pin, HIGH);
+void ir_setup() {
+  pinMode(PIN_IR, OUTPUT);
+  digitalWrite(PIN_IR, HIGH);
 }
 
 void ir_on() {
-  digitalWrite(__ir_pin, LOW);
+  digitalWrite(PIN_IR, LOW);
 }
 
 void ir_off() {
-  digitalWrite(__ir_pin, HIGH);
+  digitalWrite(PIN_IR, HIGH);
 }

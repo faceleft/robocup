@@ -1,6 +1,7 @@
-#ifndef PINS_H
-#define PINS_H
-#include "Arduino.h"
+#ifndef ROBOT_PINS_H
+#define ROBOT_PINS_H
+
+#include <stdint.h>
 
 extern const uint8_t PIN_VREF;
 extern const uint8_t PIN_VBATTERY;
@@ -21,6 +22,6 @@ extern const uint8_t DIODE_RED_ADDR;
 extern const uint8_t DIODE_GREEN_ADDR;
 extern const uint8_t DIODE_BLUE_ADDR;
 
-extern const uint8_t IR;
+extern const uint8_t PIN_IR;
 
 #endif

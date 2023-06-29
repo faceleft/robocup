@@ -1,13 +1,14 @@
-#ifndef buttons_h
-#define buttons_h
+#ifndef ROBOT_BUTTONS_H
+#define ROBOT_BUTTONS_H
 
-void buttons_task(\ //NULL если нет действий
+// NULL если нет действий
+void buttons_task(\
     void (*button1_handler)(void),\
     void (*button2_handler)(void),\
     void (*button3_handler)(void),\
     void (*button4_handler)(void),\
     void (*button5_handler)(void),\
-    void (*button6_handler)(void),\
+    void (*button6_handler)(void)\
 );
 
 #endif
